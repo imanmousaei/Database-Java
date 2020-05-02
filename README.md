@@ -14,9 +14,9 @@
 {
     "Command" : "Create Table" ,
     "Columns" : [
-        { "name" : "id" , "type" : int }
-        { "name" : "name" , "type" : String , "len" : 30 }
-        { "name" : "password" , "type" : String , "len" : 25 }
+        { "name" : "id" , "type" : "int" }
+        { "name" : "name" , "type" : "String" , "len" : 30 }
+        { "name" : "password" , "type" : "String" , "len" : 25 }
      ]
 }
 ```
