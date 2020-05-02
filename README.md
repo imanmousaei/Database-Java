@@ -2,17 +2,17 @@
 ## Create Table :
 ```
 {
-    "Command" : "Create Table"
+    "Command" : "Create Table" ,
     "Columns" : [
         { "name" : $columnName , "type" : $columnType , "len" : $maxColumnLength(if it's not int) }
         ...
      ]
 }
 ```
-### Example :
+#### Example :
 ```
 {
-    "Command" : "Create Table"
+    "Command" : "Create Table" ,
     "Columns" : [
         { "name" : "id" , "type" : int }
         { "name" : "name" , "type" : String , "len" : 30 }
