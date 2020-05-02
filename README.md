@@ -4,7 +4,7 @@
 {
     "Command" : "Create Table" ,
     "Columns" : [
-        { "name" : $columnName , "type" : $columnType , "len" : $maxColumnLength(if it's not int) }
+        { "name" : $columnName , "type" : $columnType , "len" : $maxColumnLength(if it's not int) } ,
         ...
      ]
 }
@@ -14,8 +14,8 @@
 {
     "Command" : "Create Table" ,
     "Columns" : [
-        { "name" : "id" , "type" : "int" }
-        { "name" : "name" , "type" : "String" , "len" : 30 }
+        { "name" : "id" , "type" : "int" } ,
+        { "name" : "name" , "type" : "String" , "len" : 30 } ,
         { "name" : "password" , "type" : "String" , "len" : 25 }
      ]
 }
