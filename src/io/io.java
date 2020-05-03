@@ -4,9 +4,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import model.Column;
-import model.JsonObject;
-import model.JsonValue;
+import model.*;
+import model.JSON.*;
 
 import static io.FileIO.*;
 import static io.Strings.*;
@@ -26,6 +25,8 @@ public class io {
 
     public static void processInput(String input) {
         JsonObject obj = new JsonObject(input);
+        obj.trimInput();
+        obj.processInput();
         String command = obj.getString(COMMAND);
         if (command.equals(CREATE_TABLE)) {
             createTable(obj.getString(TABLE), extractColumnFromJson(obj));
@@ -50,8 +51,11 @@ public class io {
 
     private static ArrayList<Column> extractColumnFromJson(JsonObject jsonObject) {
         ArrayList<Column> cols = new ArrayList<>();
-        ArrayList<JsonValue<?>> jsonCols = jsonObject.getArrayList("Column");
+        ArrayList<JsonValue<?>> jsonCols = jsonObject.getArrayList(COLUMNS);
         for (JsonValue<?> jsonValueCol : jsonCols) {
+            if(jsonValueCol instanceof JsonNull){
+                continue;
+            }
             JsonObject colObj = (JsonObject) jsonValueCol;
             Column c;
             if (colObj.getString(TYPE).equals(STRING)) {
