@@ -29,6 +29,10 @@ public class JsonObject extends JsonValue<HashMap<String, JsonValue<?>>> {
         return tmp.getValue();
     }
 
+    public int getInt(String key) {
+        return (int)this.getDouble(key);
+    }
+
     public String getString(String key) {
         JsonString tmp = (JsonString) value.get(key);
         return tmp.getValue();
