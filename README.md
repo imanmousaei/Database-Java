@@ -84,7 +84,7 @@
 {
     "Command" : "Delete" ,
     "Table" : $tableName ,
-    $PrimaryColumnName : $primaryData 
+    $primaryColumnName : $primaryData 
 }
 ```
 
@@ -92,6 +92,24 @@
 ```
 {
     "Command" : "Delete" ,
+    "Table" : "testTable" ,
+    "id" : 137
+}
+```
+
+## Search in a Table :
+```
+{
+    "Command" : "Search" ,
+    "Table" : $tableName ,
+    $PrimaryColumnName : $primaryData 
+}
+```
+
+#### Example :
+```
+{
+    "Command" : "Search" ,
     "Table" : "testTable" ,
     "id" : 137
 }

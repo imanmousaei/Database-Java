@@ -6,6 +6,7 @@ public class Strings {
     public static final String INSERT = "Insert";
     public static final String EDIT = "Edit";
     public static final String DELETE = "Delete";
+    public static final String SEARCH = "Search";
 
 
     public static final String COMMAND = "Command";
