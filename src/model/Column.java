@@ -13,6 +13,7 @@ public class Column{
     public Column(String name, String type) {
         this.name = name;
         this.type = type;
+        this.size = Double.BYTES;
     }
 
 
@@ -38,5 +39,14 @@ public class Column{
 
     public void setSize(int size) {
         this.size = size;
+    }
+
+    @Override
+    public String toString() {
+        return "Column{" +
+                "name='" + name + '\'' +
+                ", type='" + type + '\'' +
+                ", size=" + size +
+                '}';
     }
 }
