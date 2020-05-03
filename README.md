@@ -4,22 +4,22 @@
 {
     "Command" : "Create Table" ,
     "Table" : $tableName ,
+    "Primary" : $primaryColumnName ,
     "Columns" : [
-        "Primary" : $primaryColumnName ,
         { "columnName" : $columnName , "type" : $columnType , "len" : $maxColumnLength(if it's String) } ,
         ...
     ]
 }
 ```
-##### Note : type can be int/float/double/String/char
+##### Note : type can be double/String
 
 #### Example :
 ```
 {
     "Command" : "Create Table" ,
     "Table" : "testTable" ,
+    "Primary" : "id" ,
     "Columns" : [
-        "Primary" : "id" ,
         { "columnName" : "id" , "type" : "int" } ,
         { "columnName" : "GPA" , "type" : "double" } ,
         { "columnName" : "name" , "type" : "String" , "len" : 30 } ,
