@@ -33,7 +33,7 @@ public class JsonObject extends JsonValue<HashMap<String, JsonValue<?>>> {
     private String json;
     private int index = 0;
 
-    JsonObject(String json) {
+    public JsonObject(String json) {
         value = new HashMap<>();
         this.json = json;
     }
