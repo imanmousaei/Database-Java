@@ -5,7 +5,7 @@
     "Command" : "Create Table" ,
     "Columns" : [
         "Primary" : $primaryColumnName ,
-        { "name" : $columnName , "type" : $columnType , "len" : $maxColumnLength(if it's not number) } ,
+        { "name" : $columnName , "type" : $columnType , "len" : $maxColumnLength(if it's String) } ,
         ...
      ]
 }
