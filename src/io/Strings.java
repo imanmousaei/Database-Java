@@ -9,6 +9,7 @@ public class Strings {
 
 
     public static final String COMMAND = "Command";
+    public static final String PRIMARY = "Primary";
     public static final String TABLE = "Table";
     public static final String TYPE = "type";
     public static final String LENGTH = "len";
@@ -19,8 +20,5 @@ public class Strings {
     public static final String STRING = "String";
     public static final String INT = "int";
     public static final String DOUBLE = "double";
-    public static final String FLOAT = "float";
-    public static final String CHAR = "char";
-
 
 }

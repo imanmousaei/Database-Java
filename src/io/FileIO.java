@@ -20,9 +20,10 @@ public class FileIO {
         file.createNewFile();
     }
 
-    public static void writeSchemaToFile(String fileName, ArrayList<Column> cols) throws FileNotFoundException {
+    public static void writeSchemaToFile(String fileName, String primary, ArrayList<Column> cols) throws FileNotFoundException {
         PrintWriter out = new PrintWriter(fileName);
-        for(Column col:cols){
+        out.println(primary);
+        for (Column col : cols) {
             out.println(col);
         }
         out.close();

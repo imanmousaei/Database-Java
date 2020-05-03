@@ -30,7 +30,7 @@ public class io {
         obj.processInput();
         String command = obj.getString(COMMAND);
         if (command.equals(CREATE_TABLE)) {
-            createTable(obj.getString(TABLE), extractColumnFromJson(obj));
+            createTable(obj.getString(TABLE), obj.getString(PRIMARY), extractColumnFromJson(obj));
         }
         else if (command.equals(INSERT)) {
             // todo
@@ -45,9 +45,9 @@ public class io {
 
     }
 
-    private static void createTable(String tableName, ArrayList<Column> cols) throws FileNotFoundException {
+    private static void createTable(String tableName, String primary, ArrayList<Column> cols) throws FileNotFoundException {
         createFolder("Tables/" + tableName);
-        writeSchemaToFile("Tables/" + tableName + "/schema.json", cols);
+        writeSchemaToFile("Tables/" + tableName + "/schema.json", primary, cols);
         // TODO
     }
 
