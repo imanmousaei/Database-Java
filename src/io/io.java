@@ -1,6 +1,7 @@
 package io;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -24,7 +25,7 @@ public class io {
         return json;
     }
 
-    public static void processInput(String input) throws FileNotFoundException {
+    public static void processInput(String input) throws IOException {
         JsonObject obj = new JsonObject(input);
         obj.trimInput();
         obj.processInput();
@@ -45,7 +46,7 @@ public class io {
 
     }
 
-    private static void createTable(String tableName, String primary, ArrayList<Column> cols) throws FileNotFoundException {
+    private static void createTable(String tableName, String primary, ArrayList<Column> cols) throws IOException {
         createFolder("Tables/" + tableName);
         writeSchemaToFile("Tables/" + tableName + "/schema.json", primary, cols);
         // TODO
