@@ -49,7 +49,8 @@ public class io {
     private static void createTable(String tableName, String primary, ArrayList<Column> cols) throws IOException {
         createFolder("Tables/" + tableName);
         writeSchemaToFile("Tables/" + tableName + "/schema.json", primary, cols);
-        // TODO
+        createFile("Tables/" + tableName + "/DB.json");
+        createFile("Tables/" + tableName + "/index.json");
     }
 
     private static ArrayList<Column> extractColumnFromJson(JsonObject jsonObject) {
