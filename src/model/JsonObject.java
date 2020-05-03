@@ -111,8 +111,7 @@ public class JsonObject extends JsonValue<HashMap<String, JsonValue<?>>> {
         while (index < json.length() - 1) {
             if (json.charAt(index) == '}') {
                 cnt--;
-            }
-            else if (json.charAt(index) == '{') {
+            } else if (json.charAt(index) == '{') {
                 cnt++;
             }
 
@@ -132,34 +131,23 @@ public class JsonObject extends JsonValue<HashMap<String, JsonValue<?>>> {
     private JsonValue<?> getInsideValue() {
         if (index >= json.length()) {
             return new JsonNull(null);
-        }
-        else if (json.charAt(index) == '\"') {
+        } else if (json.charAt(index) == '\"') {
             return new JsonString(getInsideString());
-        }
-
-        else if (Character.toLowerCase(json.charAt(index)) == 'f') {
+        } else if (Character.toLowerCase(json.charAt(index)) == 'f') {
             index += 6; // false,
             return new JsonBool(false);
-        }
-
-        else if (Character.toLowerCase(json.charAt(index)) == 't') {
+        } else if (Character.toLowerCase(json.charAt(index)) == 't') {
             index += 5; // true,
             return new JsonBool(true);
-        }
-
-        else if (Character.toLowerCase(json.charAt(index)) == 'n') {
+        } else if (Character.toLowerCase(json.charAt(index)) == 'n') {
             index += 5; // null,
             return new JsonNull(null);
-        }
-
-        else if (json.charAt(index) == '{') {
+        } else if (json.charAt(index) == '{') {
             JsonObject object = new JsonObject(getInsideObject());
             object.processInput();
 
             return object;
-        }
-
-        else if (json.charAt(index) == '[') {
+        } else if (json.charAt(index) == '[') {
             ArrayList<JsonValue<?>> temp = new ArrayList<>();
             index++;
             while (index < json.length() - 1 && json.charAt(index) != ']') {
@@ -167,9 +155,7 @@ public class JsonObject extends JsonValue<HashMap<String, JsonValue<?>>> {
             }
             index++;
             return new JsonArray(temp);
-        }
-
-        else if (json.charAt(index) == '-' || Character.isDigit(json.charAt(index))) {
+        } else if (json.charAt(index) == '-' || Character.isDigit(json.charAt(index))) {
             int beginIndex = index, endIndex;
 
             if (json.charAt(index) == '-') {
