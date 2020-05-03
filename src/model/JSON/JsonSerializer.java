@@ -1,4 +1,4 @@
-package model;
+package model.JSON;
 
 import java.util.ArrayList;
 import java.util.HashMap;

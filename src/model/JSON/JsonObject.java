@@ -1,8 +1,5 @@
-package model;
+package model.JSON;
 
-import com.sun.istack.internal.Nullable;
-
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -13,10 +10,8 @@ public class JsonObject extends JsonValue<HashMap<String, JsonValue<?>>> {
     public JsonObject(String json) {
         value = new HashMap<>();
         this.json = json;
-    }
-
-    JsonObject() {
-        value = new HashMap<>();
+//        trimInput();
+//        processInput();
     }
 
     // <getters>
@@ -54,13 +49,10 @@ public class JsonObject extends JsonValue<HashMap<String, JsonValue<?>>> {
     // </getters>
 
 
-    public void getInput(InputStream inputStream) {
-//        Scanner scan = new Scanner(inputStream);
-//        while(scan.hasNextLine()){
-//            json += scan.nextLine(); //TODO uncomment
-//        }
+    public void trimInput() {
         StringBuilder sb = new StringBuilder(json);
         sb.deleteCharAt(0);
+//        sb.deleteCharAt(sb.length()-1);
 
         json = sb.toString();
         json = json.trim();
@@ -176,41 +168,3 @@ public class JsonObject extends JsonValue<HashMap<String, JsonValue<?>>> {
 
 
 }
-
-
-class JsonString extends JsonValue<String> {
-    JsonString(String value) {
-        super(value);
-    }
-}
-
-class JsonBool extends JsonValue<Boolean> {
-    JsonBool(boolean value) {
-        super(value);
-    }
-}
-
-class JsonDouble extends JsonValue<Double> {
-    JsonDouble(Double value) {
-        super(value);
-    }
-}
-
-class JsonArray extends JsonValue<ArrayList<JsonValue<?>>> {
-    JsonArray(ArrayList<JsonValue<?>> value) {
-        super(value);
-    }
-
-    public void print() {
-        for (int i = 0; i < value.size(); i++) {
-            System.out.print(value.get(i).value + " ");
-        }
-    }
-}
-
-class JsonNull extends JsonValue {
-    JsonNull(@Nullable Object value) {
-        super(value);
-    }
-}
-

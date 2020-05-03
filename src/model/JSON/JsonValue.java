@@ -1,4 +1,4 @@
-package model;
+package model.JSON;
 
 public class JsonValue<T> {
     protected T value;
