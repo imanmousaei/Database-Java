@@ -2,7 +2,7 @@ package io;
 
 public class Strings {
     // Commands :
-    public static final String CREATE_TABLE = "Create Table";
+    public static final String CREATE_TABLE = "CreateTable";
     public static final String INSERT = "Insert";
     public static final String EDIT = "Edit";
     public static final String DELETE = "Delete";

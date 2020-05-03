@@ -16,7 +16,7 @@
 #### Example :
 ```
 {
-    "Command" : "Create Table" ,
+    "Command" : "CreateTable" ,
     "Table" : "testTable" ,
     "Primary" : "id" ,
     "Columns" : [
