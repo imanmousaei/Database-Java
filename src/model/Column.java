@@ -43,10 +43,10 @@ public class Column{
 
     @Override
     public String toString() {
-        return "Column{" +
-                "name='" + name + '\'' +
-                ", type='" + type + '\'' +
-                ", size=" + size +
+        return "{" +
+                " \"columnName\" : \"" + name + '\"' +
+                ", \"type\" : \"" + type + '\"' +
+                ", \"size\" : " + size +
                 '}';
     }
 }
