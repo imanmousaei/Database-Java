@@ -1,5 +1,6 @@
 package io;
 
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -23,7 +24,7 @@ public class io {
         return json;
     }
 
-    public static void processInput(String input) {
+    public static void processInput(String input) throws FileNotFoundException {
         JsonObject obj = new JsonObject(input);
         obj.trimInput();
         obj.processInput();
@@ -44,8 +45,9 @@ public class io {
 
     }
 
-    private static void createTable(String tableName, ArrayList<Column> cols) {
+    private static void createTable(String tableName, ArrayList<Column> cols) throws FileNotFoundException {
         createFolder("Tables/" + tableName);
+        writeSchemaToFile("Tables/" + tableName + "/schema.json", cols);
         // TODO
     }
 
@@ -53,9 +55,10 @@ public class io {
         ArrayList<Column> cols = new ArrayList<>();
         ArrayList<JsonValue<?>> jsonCols = jsonObject.getArrayList(COLUMNS);
         for (JsonValue<?> jsonValueCol : jsonCols) {
-            if(jsonValueCol instanceof JsonNull){
+            if (jsonValueCol instanceof JsonNull) {
                 continue;
             }
+
             JsonObject colObj = (JsonObject) jsonValueCol;
             Column c;
             if (colObj.getString(TYPE).equals(STRING)) {
