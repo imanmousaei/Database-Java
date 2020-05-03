@@ -20,7 +20,7 @@
     "Table" : "testTable" ,
     "Primary" : "id" ,
     "Columns" : [
-        { "columnName" : "id" , "type" : "int" } ,
+        { "columnName" : "id" , "type" : "double" } ,
         { "columnName" : "GPA" , "type" : "double" } ,
         { "columnName" : "name" , "type" : "String" , "len" : 30 } ,
         { "columnName" : "password" , "type" : "String" , "len" : 25 }
