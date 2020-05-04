@@ -19,6 +19,10 @@ public class JsonObject extends JsonValue<HashMap<String, JsonValue<?>>> {
         return value.get(key);
     }
 
+    public String getJson(){
+        return json;
+    }
+
     public double getDouble(String key) {
         JsonDouble tmp = (JsonDouble) value.get(key);
         return tmp.getValue();
@@ -53,10 +57,30 @@ public class JsonObject extends JsonValue<HashMap<String, JsonValue<?>>> {
         StringBuilder sb = new StringBuilder(json);
         sb.deleteCharAt(0);
 //        sb.deleteCharAt(sb.length()-1);
+        int i = 0;
+        while(i < sb.length()){
+            if(Character.isWhitespace(sb.charAt(i))){
+                sb.deleteCharAt(i);
+            }
+            else if(sb.charAt(i)=='\"'){
+                i++;
+                while(sb.charAt(i) != '\"'){
+                    i++;
+                }
+                i++;
+            }
+            else{
+                i++;
+            }
+        }
+
 
         json = sb.toString();
-        json = json.trim();
-        json = json.replaceAll("\\s+", "");
+//        json = json.trim();
+//        json = json.replaceAll("\\s+", "");
+
+
+
     }
 
     private String getInsideString() {
