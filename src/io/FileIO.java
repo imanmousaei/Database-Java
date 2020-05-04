@@ -2,10 +2,7 @@ package io;
 
 import model.Column;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.ArrayList;
 
 public class FileIO {
@@ -28,4 +25,13 @@ public class FileIO {
         }
         out.close();
     }
+
+    public static void appendToFile(String fileName,String textToAppend) throws IOException {
+        BufferedWriter writer = new BufferedWriter(
+                new FileWriter(fileName, true)  //Set true for append mode
+        );
+        writer.write(textToAppend);
+        writer.close();
+    }
+
 }

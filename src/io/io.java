@@ -1,5 +1,6 @@
 package io;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,11 +31,13 @@ public class io {
         obj.trimInput();
         obj.processInput();
         String command = obj.getString(COMMAND);
+        String tableName = obj.getString(TABLE);
+
         if (command.equals(CREATE_TABLE)) {
-            createTable(obj.getString(TABLE), obj.getString(PRIMARY), extractColumnFromJson(obj));
+            createTable(tableName, obj.getString(PRIMARY), extractColumnFromJson(obj));
         }
         else if (command.equals(INSERT)) {
-            // todo
+            insertToTable(tableName,obj.getObject(DATA));
         }
         else if (command.equals(DELETE)) {
             // todo
@@ -49,11 +52,49 @@ public class io {
 
     }
 
+    private static void insertToTable(String tableName,JsonObject obj) throws IOException {
+        Scanner schemaScanner = new Scanner(new File("Tables/" + tableName));
+
+        String primary = schemaScanner.nextLine();
+        String directory = "Tables/" + tableName + "/" ;
+
+//        appendToFile(directory + INDEX_FILE_NAME ,  );
+
+        while(schemaScanner.hasNextLine()){
+            String columnName = schemaScanner.next();
+            String type = schemaScanner.next();
+            int size = schemaScanner.nextInt();
+            if(type.equals(DOUBLE)){
+                double value = obj.getDouble(columnName);
+                appendToFile(DB_FILE_NAME,Double.toString(value));
+            }
+            else if(type.equals(STRING)){
+                String value = obj.getString(columnName);
+                while(value.length() < size){
+                    value = value.concat(" ");
+                }
+                appendToFile(DB_FILE_NAME,value);
+            }
+            appendToFile(DB_FILE_NAME,"\n");
+        }
+        schemaScanner.close();
+    }
+
+    private static int searchPrimaryIndex(String primary){ // O(n)
+        return -1;
+    }
+
+    private static int searchAnyIndex(String columnName){ // O(n)
+        return -1;
+    }
+
     private static void createTable(String tableName, String primary, ArrayList<Column> cols) throws IOException {
         createFolder("Tables/" + tableName);
-        writeSchemaToFile("Tables/" + tableName + "/schema" + SCHEMA_EXTENSION, primary, cols);
-        createFile("Tables/" + tableName + "/DB" + DB_EXTENSION);
-        createFile("Tables/" + tableName + "/index" + INDEX_EXTENSION);
+
+        String directory = "Tables/" + tableName + "/" ;
+        writeSchemaToFile(directory + SCHEMA_FILE_NAME, primary, cols);
+        createFile(directory + DB_FILE_NAME);
+        createFile(directory + INDEX_FILE_NAME);
     }
 
     private static ArrayList<Column> extractColumnFromJson(JsonObject jsonObject) {
