@@ -1,6 +1,6 @@
 package model;
 
-public class Column{
+public class Column {
     private String name;
     private String type;
     private int size;
@@ -10,6 +10,7 @@ public class Column{
         this.type = type;
         this.size = size;
     }
+
     public Column(String name, String type) {
         this.name = name;
         this.type = type;
@@ -43,6 +44,10 @@ public class Column{
 
     @Override
     public String toString() {
+        return name + " " + type + " " + size;
+    }
+
+    public String toJson() {
         return "{" +
                 " \"columnName\" : \"" + name + '\"' +
                 ", \"type\" : \"" + type + '\"' +

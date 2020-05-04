@@ -1,5 +1,7 @@
 package io;
 
+import java.security.cert.Extension;
+
 public class Strings {
     // Commands :
     public static final String CREATE_TABLE = "CreateTable";
@@ -21,5 +23,11 @@ public class Strings {
     public static final String STRING = "String";
     public static final String INT = "int";
     public static final String DOUBLE = "double";
+
+    // Extensions :
+    public static final String SCHEMA_EXTENSION = ".sch";
+    public static final String DB_EXTENSION = ".sql";
+    public static final String INDEX_EXTENSION = ".idx";
+
 
 }

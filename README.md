@@ -102,7 +102,7 @@
 {
     "Command" : "Search" ,
     "Table" : $tableName ,
-    $PrimaryColumnName : $primaryData 
+    $primaryColumnName : $primaryData 
 }
 ```
 

@@ -42,15 +42,18 @@ public class io {
         else if (command.equals(EDIT)) {
             // todo
         }
+        else if (command.equals(SEARCH)) {
+            // todo
+        }
 
 
     }
 
     private static void createTable(String tableName, String primary, ArrayList<Column> cols) throws IOException {
         createFolder("Tables/" + tableName);
-        writeSchemaToFile("Tables/" + tableName + "/schema.json", primary, cols);
-        createFile("Tables/" + tableName + "/DB.json");
-        createFile("Tables/" + tableName + "/index.json");
+        writeSchemaToFile("Tables/" + tableName + "/schema" + SCHEMA_EXTENSION, primary, cols);
+        createFile("Tables/" + tableName + "/DB" + DB_EXTENSION);
+        createFile("Tables/" + tableName + "/index" + INDEX_EXTENSION);
     }
 
     private static ArrayList<Column> extractColumnFromJson(JsonObject jsonObject) {
