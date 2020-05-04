@@ -58,7 +58,7 @@ public class io {
         String primary = schemaScanner.nextLine();
         String directory = "Tables/" + tableName + "/" ;
 
-//        appendToFile(directory + INDEX_FILE_NAME ,  );
+//        appendToFile(directory + INDEX_FILE_NAME ,  ); todo
 
         while(schemaScanner.hasNextLine()){
             String columnName = schemaScanner.next();
@@ -92,9 +92,11 @@ public class io {
         createFolder("Tables/" + tableName);
 
         String directory = "Tables/" + tableName + "/" ;
+
         writeSchemaToFile(directory + SCHEMA_FILE_NAME, primary, cols);
         createFile(directory + DB_FILE_NAME);
         createFile(directory + INDEX_FILE_NAME);
+        appendToFile(directory+INDEX_FILE_NAME,"0");
     }
 
     private static ArrayList<Column> extractColumnFromJson(JsonObject jsonObject) {
