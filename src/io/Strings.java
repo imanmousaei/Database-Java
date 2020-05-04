@@ -17,6 +17,7 @@ public class Strings {
     public static final String TYPE = "type";
     public static final String LENGTH = "len";
     public static final String COLUMNS = "Columns";
+    public static final String DATA = "Data";
     public static final String COLUMN_NAME = "columnName";
 
     // Types :
@@ -24,10 +25,10 @@ public class Strings {
     public static final String INT = "int";
     public static final String DOUBLE = "double";
 
-    // Extensions :
-    public static final String SCHEMA_EXTENSION = ".sch";
-    public static final String DB_EXTENSION = ".sql";
-    public static final String INDEX_EXTENSION = ".idx";
+    // File Names :
+    public static final String SCHEMA_FILE_NAME = "schema.sch";
+    public static final String DB_FILE_NAME = "DB.sql";
+    public static final String INDEX_FILE_NAME = "index.idx";
 
 
 }
