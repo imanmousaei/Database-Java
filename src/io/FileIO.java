@@ -11,7 +11,7 @@ import static io.Strings.*;
 public class FileIO {
     public static void createFolder(String folderName) {
         File folder = new File(folderName);
-        folder.mkdir();
+        folder.mkdirs();
         // todo : dont let them create another table with the same name
     }
 
@@ -44,7 +44,7 @@ public class FileIO {
         writer.close();
     }
     public static void appendToFile(String fileName,double numberToAppend) throws IOException {
-        RandomAccessFile
+//        RandomAccessFile
     }
 
 }
