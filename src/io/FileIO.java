@@ -3,16 +3,19 @@ package io;
 import model.Column;
 
 import java.io.*;
+import java.nio.file.FileAlreadyExistsException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 import static io.Strings.*;
 
 public class FileIO {
-    public static void createFolder(String folderName) {
+    public static void createFolder(String folderName) throws FileAlreadyExistsException {
         File folder = new File(folderName);
+        if(folder.isDirectory()){
+            throw new FileAlreadyExistsException("Table Name Already Used");
+        }
         folder.mkdirs();
-        // todo : dont let them create another table with the same name
     }
 
     public static void createFile(String fileName) throws IOException {
