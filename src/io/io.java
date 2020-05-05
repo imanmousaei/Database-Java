@@ -59,13 +59,13 @@ public class io {
         Scanner schemaScanner = new Scanner(new File(directory + SCHEMA_FILE_NAME));
 
         String primary = schemaScanner.nextLine();
-
-//        appendToFile(directory + INDEX_FILE_NAME ,  ); todo
+        int objectSizeInBytes = 0;
 
         while (schemaScanner.hasNext()) {
             String columnName = schemaScanner.next();
             String type = schemaScanner.next();
             int size = schemaScanner.nextInt();
+            objectSizeInBytes += size;
             System.out.println(columnName + type + size);
             if (type.equals(DOUBLE)) {
                 double value = obj.getDouble(columnName);
