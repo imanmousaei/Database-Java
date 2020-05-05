@@ -9,6 +9,7 @@ public class Strings {
     public static final String EDIT = "Edit";
     public static final String DELETE = "Delete";
     public static final String SEARCH = "Search";
+    public static final String SHOW_TABLE = "ShowTable";
 
 
     public static final String COMMAND = "Command";

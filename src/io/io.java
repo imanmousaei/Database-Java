@@ -1,9 +1,7 @@
 package io;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -27,9 +25,9 @@ public class io {
     }
 
     public static void processInput(String input) throws IOException {
+        // todo Entity validation
         JsonObject obj = new JsonObject(input);
         obj.trimInput();
-        System.out.println(obj.getJson());
         obj.processInput();
         String command = obj.getString(COMMAND);
         String tableName = obj.getString(TABLE);
@@ -49,6 +47,9 @@ public class io {
         else if (command.equals(SEARCH)) {
             // todo
         }
+        else if (command.equals(SHOW_TABLE)) {
+            showTable(tableName, System.out);
+        }
 
 
     }
@@ -58,7 +59,7 @@ public class io {
 
         Scanner schemaScanner = new Scanner(new File(directory + SCHEMA_FILE_NAME));
 
-        String primary = schemaScanner.nextLine();
+        String primary = schemaScanner.next();
 
         while (schemaScanner.hasNext()) {
             String columnName = schemaScanner.next();
@@ -66,26 +67,74 @@ public class io {
             int size = schemaScanner.nextInt();
 
             if (type.equals(DOUBLE)) {
-                double value = obj.getDouble(columnName);
-                appendToFile(directory + DB_FILE_NAME, value);
+                try {
+                    double value = obj.getDouble(columnName);
+                    appendToFile(directory + DB_FILE_NAME, value);
+
+                    if (columnName.equals(primary)) {
+//                addPrimaryIndex();
+                        appendToFile(directory + INDEX_FILE_NAME, getTableRowCount(tableName));
+                        appendToFile(directory + INDEX_FILE_NAME, value);
+                    }
+                }
+                catch (NullPointerException e) {
+                }
             }
             else if (type.equals(STRING)) {
-                String value = obj.getString(columnName);
-                while (value.length() < size) {
-                    value = value.concat(" ");
+                try {
+                    String value = obj.getString(columnName);
+                    while (value.length() < size) {
+                        value = value.concat(" ");
+                    }
+                    appendToFile(directory + DB_FILE_NAME, value);
+
+                    if (columnName.equals(primary)) {
+//                addPrimaryIndex();
+                        appendToFile(directory + INDEX_FILE_NAME, getTableRowCount(tableName));
+                        appendToFile(directory + INDEX_FILE_NAME, value);
+                    }
                 }
-                appendToFile(directory + DB_FILE_NAME, value);
+                catch (NullPointerException e) {
+                }
             }
             appendToFile(directory + DB_FILE_NAME, "\n");
         }
         schemaScanner.close();
     }
 
-    private static int searchPrimaryIndex(String primary) { // O(n)
-        return -1;
+    private static void showTable(String tableName, PrintStream out) throws IOException {
+        String directory = "Tables/" + tableName + "/";
+
+        Scanner schemaScanner = new Scanner(new File(directory + SCHEMA_FILE_NAME));
+        RandomAccessFile dbReader = new RandomAccessFile(new File(directory + DB_FILE_NAME), "rw");
+
+        String primary = schemaScanner.next();
+
+        while (schemaScanner.hasNext()) {
+            String columnName = schemaScanner.next();
+            String type = schemaScanner.next();
+            int size = schemaScanner.nextInt();
+
+            if (type.equals(DOUBLE)) {
+                double value = dbReader.readDouble();
+                out.print(value + " ");
+            }
+            else if (type.equals(STRING)) {
+                byte[] b = new byte[size];
+                dbReader.readFully(b);
+                String value = new String(b, StandardCharsets.UTF_8);
+                out.print(value + " ");
+            }
+            out.println();
+        }
+        schemaScanner.close();
     }
 
-    private static int searchAnyIndex(String columnName) { // O(n)
+    private static void addPrimaryIndex() {
+        // todo : add it in the first null row
+    }
+
+    private static int getIndex(String primary) { // O(n)
         return -1;
     }
 

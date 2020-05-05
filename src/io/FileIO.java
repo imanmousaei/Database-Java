@@ -41,7 +41,8 @@ public class FileIO {
 
     public static void appendToFile(String fileName, String textToAppend) throws IOException {
         RandomAccessFile writer = new RandomAccessFile(new File(fileName), "rw");
-        writer.writeBytes(textToAppend);
+        byte[] b = textToAppend.getBytes();
+        writer.write(b);
         writer.close();
     }
 
@@ -55,6 +56,7 @@ public class FileIO {
         String directory = "Tables/" + tableName + "/";
 
         Scanner schemaScanner = new Scanner(new File(directory + SCHEMA_FILE_NAME));
+        schemaScanner.nextLine();
         int rowSizeInByte = 0;
 
         while (schemaScanner.hasNext()) {

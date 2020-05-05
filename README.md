@@ -114,3 +114,19 @@
     "id" : 137
 }
 ```
+
+## Show a Table :
+```
+{
+    "Command" : "ShowTable" ,
+    "Table" : $tableName 
+}
+```
+
+#### Example :
+```
+{
+    "Command" : "ShowTable" ,
+    "Table" : "testTable"
+}
+```
