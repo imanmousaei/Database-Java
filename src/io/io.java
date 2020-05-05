@@ -59,17 +59,15 @@ public class io {
         Scanner schemaScanner = new Scanner(new File(directory + SCHEMA_FILE_NAME));
 
         String primary = schemaScanner.nextLine();
-        int objectSizeInBytes = 0;
 
         while (schemaScanner.hasNext()) {
             String columnName = schemaScanner.next();
             String type = schemaScanner.next();
             int size = schemaScanner.nextInt();
-            objectSizeInBytes += size;
-            System.out.println(columnName + type + size);
+
             if (type.equals(DOUBLE)) {
                 double value = obj.getDouble(columnName);
-                appendToFile(directory + DB_FILE_NAME, Double.toString(value));
+                appendToFile(directory + DB_FILE_NAME, value);
             }
             else if (type.equals(STRING)) {
                 String value = obj.getString(columnName);
@@ -78,7 +76,7 @@ public class io {
                 }
                 appendToFile(directory + DB_FILE_NAME, value);
             }
-            appendToFile(DB_FILE_NAME, "\n");
+            appendToFile(directory + DB_FILE_NAME, "\n");
         }
         schemaScanner.close();
     }
