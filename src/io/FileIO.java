@@ -24,7 +24,7 @@ public class FileIO {
     }
 
     public static int getTableRowCount(String tableName) throws IOException { // todo do it with RandomAccessFile
-        String fileName = "Tables/" + tableName + "/" + INDEX_FILE_NAME;
+        String fileName = "Tables/" + tableName + "/" + DB_FILE_NAME;
         RandomAccessFile writer = new RandomAccessFile(new File(fileName), "rw");
         long rowCount = writer.length() / getRowSizeInByte(tableName) ;
         writer.close();

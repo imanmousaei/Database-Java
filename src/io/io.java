@@ -57,6 +57,8 @@ public class io {
     }
 
     private static void insertToTable(String tableName, JsonObject obj) throws IOException {
+        // inserts in the last row
+        // todo insert in the first null row
         String directory = "Tables/" + tableName + "/";
 
         Scanner schemaScanner = new Scanner(new File(directory + SCHEMA_FILE_NAME));
@@ -69,28 +71,28 @@ public class io {
             int size = schemaScanner.nextInt();
 
             if (type.equals(DOUBLE)) {
-                    double value = obj.getDouble(columnName);
-                    appendToFile(directory + DB_FILE_NAME, value);
+                double value = obj.getDouble(columnName);
+                appendToFile(directory + DB_FILE_NAME, value);
 
-                    if (columnName.equals(primary)) {
+                if (columnName.equals(primary)) {
 //                addPrimaryIndex();
-                        appendToFile(directory + INDEX_FILE_NAME, getTableRowCount(tableName));
-                        appendToFile(directory + INDEX_FILE_NAME, value);
-                    }
+                    appendToFile(directory + INDEX_FILE_NAME, getTableRowCount(tableName));
+                    appendToFile(directory + INDEX_FILE_NAME, value);
+                }
 
             }
             else if (type.equals(STRING)) {
-                    String value = obj.getString(columnName);
-                    while (value.length() < size) {
-                        value = value.concat(" ");
-                    }
-                    appendToFile(directory + DB_FILE_NAME, value);
+                String value = obj.getString(columnName);
+                while (value.length() < size) {
+                    value = value.concat(" ");
+                }
+                appendToFile(directory + DB_FILE_NAME, value);
 
-                    if (columnName.equals(primary)) {
+                if (columnName.equals(primary)) {
 //                addPrimaryIndex();
-                        appendToFile(directory + INDEX_FILE_NAME, getTableRowCount(tableName));
-                        appendToFile(directory + INDEX_FILE_NAME, value);
-                    }
+                    appendToFile(directory + INDEX_FILE_NAME, getTableRowCount(tableName));
+                    appendToFile(directory + INDEX_FILE_NAME, value);
+                }
             }
 //            appendToFile(directory + DB_FILE_NAME, "\n");
         }
@@ -100,12 +102,14 @@ public class io {
     private static void showTable(String tableName, PrintStream out) throws IOException {
         String directory = "Tables/" + tableName + "/";
 
-        Scanner schemaScanner = new Scanner(new File(directory + SCHEMA_FILE_NAME));
-        RandomAccessFile dbReader = new RandomAccessFile(new File(directory + DB_FILE_NAME), "rw");
+        RandomAccessFile dbReader = new RandomAccessFile(new File(directory + DB_FILE_NAME), "r");
 
-        String primary = schemaScanner.next();
+        int tableRowCount = getTableRowCount(tableName);
 
-        for(int i=0;i<getTableRowCount(tableName);i++) {
+        for (int i = 0; i < tableRowCount; i++) {
+            Scanner schemaScanner = new Scanner(new File(directory + SCHEMA_FILE_NAME));
+            String primary = schemaScanner.next();
+
             while (schemaScanner.hasNext()) {
                 String columnName = schemaScanner.next();
                 String type = schemaScanner.next();
@@ -122,9 +126,9 @@ public class io {
                     out.print(value + " ");
                 }
             }
+            schemaScanner.close();
             out.println();
         }
-        schemaScanner.close();
     }
 
     private static void addPrimaryIndex() {
