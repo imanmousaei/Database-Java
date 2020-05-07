@@ -28,7 +28,7 @@ public class Strings {
 
     // File Names :
     public static final String SCHEMA_FILE_NAME = "schema.sch";
-    public static final String DB_FILE_NAME = "DB.sql";
+    public static final String DB_FILE_NAME = "DB.db";
     public static final String INDEX_FILE_NAME = "index.idx";
 
 

@@ -24,9 +24,10 @@ public class FileIO {
     }
 
     public static int getTableRowCount(String tableName) throws IOException { // todo do it with RandomAccessFile
-        String fileName = "Tables/" + tableName + "/" + tableName;
+        String fileName = "Tables/" + tableName + "/" + INDEX_FILE_NAME;
         RandomAccessFile writer = new RandomAccessFile(new File(fileName), "rw");
         long rowCount = writer.length() / getRowSizeInByte(tableName) ;
+        writer.close();
         return (int)rowCount;
     }
 
@@ -41,6 +42,7 @@ public class FileIO {
 
     public static void appendToFile(String fileName, String textToAppend) throws IOException {
         RandomAccessFile writer = new RandomAccessFile(new File(fileName), "rw");
+        writer.seek(writer.length());
         byte[] b = textToAppend.getBytes();
         writer.write(b);
         writer.close();
@@ -48,6 +50,7 @@ public class FileIO {
 
     public static void appendToFile(String fileName, double numberToAppend) throws IOException {
         RandomAccessFile writer = new RandomAccessFile(new File(fileName), "rw");
+        writer.seek(writer.length());
         writer.writeDouble(numberToAppend);
         writer.close();
     }

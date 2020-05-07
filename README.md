@@ -70,7 +70,7 @@
 #### Example :
 ```
 {
-    "Command" : "Insert" ,
+    "Command" : "Edit" ,
     "Table" : "testTable" ,
     "Data" : {
         "id" : 137 , 

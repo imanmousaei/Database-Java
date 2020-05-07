@@ -34,9 +34,11 @@ public class io {
 
         if (command.equals(CREATE_TABLE)) {
             createTable(tableName, obj.getString(PRIMARY), extractColumnFromJson(obj));
+            System.out.println("Table Created Successfully.");
         }
         else if (command.equals(INSERT)) {
             insertToTable(tableName, obj.getObject(DATA));
+            System.out.println("Row Inserted Successfully.");
         }
         else if (command.equals(DELETE)) {
             // todo
@@ -67,7 +69,6 @@ public class io {
             int size = schemaScanner.nextInt();
 
             if (type.equals(DOUBLE)) {
-                try {
                     double value = obj.getDouble(columnName);
                     appendToFile(directory + DB_FILE_NAME, value);
 
@@ -76,12 +77,9 @@ public class io {
                         appendToFile(directory + INDEX_FILE_NAME, getTableRowCount(tableName));
                         appendToFile(directory + INDEX_FILE_NAME, value);
                     }
-                }
-                catch (NullPointerException e) {
-                }
+
             }
             else if (type.equals(STRING)) {
-                try {
                     String value = obj.getString(columnName);
                     while (value.length() < size) {
                         value = value.concat(" ");
@@ -93,11 +91,8 @@ public class io {
                         appendToFile(directory + INDEX_FILE_NAME, getTableRowCount(tableName));
                         appendToFile(directory + INDEX_FILE_NAME, value);
                     }
-                }
-                catch (NullPointerException e) {
-                }
             }
-            appendToFile(directory + DB_FILE_NAME, "\n");
+//            appendToFile(directory + DB_FILE_NAME, "\n");
         }
         schemaScanner.close();
     }
@@ -110,20 +105,22 @@ public class io {
 
         String primary = schemaScanner.next();
 
-        while (schemaScanner.hasNext()) {
-            String columnName = schemaScanner.next();
-            String type = schemaScanner.next();
-            int size = schemaScanner.nextInt();
+        for(int i=0;i<getTableRowCount(tableName);i++) {
+            while (schemaScanner.hasNext()) {
+                String columnName = schemaScanner.next();
+                String type = schemaScanner.next();
+                int size = schemaScanner.nextInt();
 
-            if (type.equals(DOUBLE)) {
-                double value = dbReader.readDouble();
-                out.print(value + " ");
-            }
-            else if (type.equals(STRING)) {
-                byte[] b = new byte[size];
-                dbReader.readFully(b);
-                String value = new String(b, StandardCharsets.UTF_8);
-                out.print(value + " ");
+                if (type.equals(DOUBLE)) {
+                    double value = dbReader.readDouble();
+                    out.print(value + " ");
+                }
+                else if (type.equals(STRING)) {
+                    byte[] b = new byte[size];
+                    dbReader.readFully(b);
+                    String value = new String(b, StandardCharsets.UTF_8);
+                    out.print(value + " ");
+                }
             }
             out.println();
         }
