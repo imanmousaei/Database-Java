@@ -43,6 +43,7 @@ public class io {
         }
         else if (command.equals(DELETE)) {
             deleteRow(tableName, obj);
+            System.out.println("Row Deleted Successfully.");
         }
         else if (command.equals(EDIT)) {
             // todo
@@ -63,12 +64,12 @@ public class io {
         Column primaryCol = getPrimary(tableName);
         int indexRowSize = primaryCol.getSize() + 1; // bool deleted : 1 Byte
 
-        if(primaryCol.getType().equals(STRING)) {
+        if (primaryCol.getType().equals(STRING)) {
             String wantedPrimary = obj.getString(primaryCol.getName());
             int index = getIndex(tableName, wantedPrimary);
             writer.seek(index * indexRowSize);
         }
-        else{
+        else {
             double wantedPrimary = obj.getDouble(primaryCol.getName());
             int index = getIndex(tableName, wantedPrimary);
             writer.seek(index * indexRowSize);
@@ -80,6 +81,7 @@ public class io {
     private static void insertToTable(String tableName, JsonObject obj) throws IOException {
         // inserts in the last row
         // todo insert in the first null row
+        // todo check if the primary already exists
         String directory = "Tables/" + tableName + "/";
 
         Scanner schemaScanner = new Scanner(new File(directory + SCHEMA_FILE_NAME));
@@ -141,34 +143,34 @@ public class io {
 
                 if (type.equals(DOUBLE)) {
                     double value = dbReader.readDouble();
-                    out.print(value + " ");
+                    out.print(value + "  ");
                 }
                 else if (type.equals(STRING)) {
                     byte[] b = new byte[size];
                     dbReader.readFully(b);
                     String value = new String(b, StandardCharsets.UTF_8);
-                    out.print(value + " ");
+                    out.print(value.trim() + "  ");
                 }
             }
             schemaScanner.close();
-            out.println();
 
             // print index file
 
             boolean deleted = indexReader.readBoolean();
-            out.print(deleted + " ");
+            out.print(deleted);
+            out.println();
 
             if (primaryCol.getType().equals(DOUBLE)) {
                 double value = indexReader.readDouble();
-                out.print(value + " ");
+//                out.print(value + " ");
             }
             else if (primaryCol.getType().equals(STRING)) {
                 byte[] b = new byte[primaryCol.getSize()];
                 indexReader.readFully(b);
                 String value = new String(b, StandardCharsets.UTF_8);
-                out.print(value + " ");
+//                out.print(value + " ");
             }
-            out.println();
+//            out.println();
         }
     }
 
