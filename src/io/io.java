@@ -76,7 +76,7 @@ public class io {
 
                 if (columnName.equals(primary)) {
 //                addPrimaryIndex();
-                    appendToFile(directory + INDEX_FILE_NAME, getTableRowCount(tableName));
+                    appendToFile(directory + INDEX_FILE_NAME, false); // deleted = false
                     appendToFile(directory + INDEX_FILE_NAME, value);
                 }
 
@@ -90,7 +90,7 @@ public class io {
 
                 if (columnName.equals(primary)) {
 //                addPrimaryIndex();
-                    appendToFile(directory + INDEX_FILE_NAME, getTableRowCount(tableName));
+                    appendToFile(directory + INDEX_FILE_NAME, false);
                     appendToFile(directory + INDEX_FILE_NAME, value);
                 }
             }
@@ -147,7 +147,6 @@ public class io {
         writeSchemaToFile(directory + SCHEMA_FILE_NAME, primary, cols);
         createFile(directory + DB_FILE_NAME);
         createFile(directory + INDEX_FILE_NAME);
-        appendToFile(directory + INDEX_FILE_NAME, "0");
     }
 
     private static ArrayList<Column> extractColumnFromJson(JsonObject jsonObject) {
@@ -166,7 +165,6 @@ public class io {
             else {
                 c = new Column(colObj.getString(COLUMN_NAME), colObj.getString(TYPE));
             }
-            System.out.println(c);
             cols.add(c);
         }
         return cols;

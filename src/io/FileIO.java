@@ -1,7 +1,9 @@
 package io;
 
+import com.sun.istack.internal.Nullable;
 import model.Column;
 
+import javax.xml.ws.Action;
 import java.io.*;
 import java.nio.file.FileAlreadyExistsException;
 import java.util.ArrayList;
@@ -23,12 +25,29 @@ public class FileIO {
         file.createNewFile();
     }
 
-    public static int getTableRowCount(String tableName) throws IOException { // todo do it with RandomAccessFile
+    public static int getTableRowCount(String tableName) throws IOException {
         String fileName = "Tables/" + tableName + "/" + DB_FILE_NAME;
         RandomAccessFile writer = new RandomAccessFile(new File(fileName), "rw");
         long rowCount = writer.length() / getRowSizeInByte(tableName) ;
         writer.close();
         return (int)rowCount;
+    }
+
+    public static String getPrimaryType(String tableName) throws IOException {
+        String directory = "Tables/" + tableName + "/" ;
+        Scanner schemaScanner = new Scanner(new File(directory + SCHEMA_FILE_NAME));
+        String primary = schemaScanner.next();
+
+        while (schemaScanner.hasNext()) {
+            String columnName = schemaScanner.next();
+            String type = schemaScanner.next();
+            int size = schemaScanner.nextInt();
+            if (columnName.equals(primary)) {
+                schemaScanner.close();
+                return type;
+            }
+        }
+        return null;
     }
 
     public static void writeSchemaToFile(String fileName, String primary, ArrayList<Column> cols) throws FileNotFoundException {
@@ -40,7 +59,7 @@ public class FileIO {
         out.close();
     }
 
-    public static void appendToFile(String fileName, String textToAppend) throws IOException {
+    public static void appendToFile(String fileName, String textToAppend) throws IOException { // appends in  binary format
         RandomAccessFile writer = new RandomAccessFile(new File(fileName), "rw");
         writer.seek(writer.length());
         byte[] b = textToAppend.getBytes();
@@ -48,7 +67,14 @@ public class FileIO {
         writer.close();
     }
 
-    public static void appendToFile(String fileName, double numberToAppend) throws IOException {
+    public static void appendToFile(String fileName, boolean bool) throws IOException { // appends in  binary format
+        RandomAccessFile writer = new RandomAccessFile(new File(fileName), "rw");
+        writer.seek(writer.length());
+        writer.writeBoolean(bool);
+        writer.close();
+    }
+
+    public static void appendToFile(String fileName, double numberToAppend) throws IOException { // appends in  binary format
         RandomAccessFile writer = new RandomAccessFile(new File(fileName), "rw");
         writer.seek(writer.length());
         writer.writeDouble(numberToAppend);
