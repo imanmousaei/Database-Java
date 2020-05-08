@@ -5,6 +5,7 @@ import model.Column;
 
 import javax.xml.ws.Action;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileAlreadyExistsException;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -28,13 +29,13 @@ public class FileIO {
     public static int getTableRowCount(String tableName) throws IOException {
         String fileName = "Tables/" + tableName + "/" + DB_FILE_NAME;
         RandomAccessFile writer = new RandomAccessFile(new File(fileName), "rw");
-        long rowCount = writer.length() / getRowSizeInByte(tableName) ;
+        long rowCount = writer.length() / getRowSizeInByte(tableName);
         writer.close();
-        return (int)rowCount;
+        return (int) rowCount;
     }
 
-    public static String getPrimaryType(String tableName) throws IOException {
-        String directory = "Tables/" + tableName + "/" ;
+    public static Column getPrimary(String tableName) throws IOException {
+        String directory = "Tables/" + tableName + "/";
         Scanner schemaScanner = new Scanner(new File(directory + SCHEMA_FILE_NAME));
         String primary = schemaScanner.next();
 
@@ -44,11 +45,58 @@ public class FileIO {
             int size = schemaScanner.nextInt();
             if (columnName.equals(primary)) {
                 schemaScanner.close();
-                return type;
+                return new Column(columnName, type, size);
             }
         }
         return null;
     }
+
+    public static int getIndex(String tableName, String wantedPrimary) throws IOException { // O(n)
+        String directory = "Tables/" + tableName + "/";
+        RandomAccessFile indexReader = new RandomAccessFile(new File(directory + INDEX_FILE_NAME), "r"); // todo
+        Column primaryCol = getPrimary(tableName);
+
+        int tableRowCount = getTableRowCount(tableName);
+
+        for (int i = 0; i < tableRowCount; i++) {
+            boolean deleted = indexReader.readBoolean();
+            byte[] b = new byte[primaryCol.getSize()];
+            indexReader.readFully(b);
+            String value = new String(b, StandardCharsets.UTF_8);
+
+            if (value.equals(wantedPrimary)) {
+                return i;
+            }
+
+        }
+
+        return -1;
+    }
+
+    public static int getIndex(String tableName, double wantedPrimary) throws IOException { // O(n)
+        String directory = "Tables/" + tableName + "/";
+        RandomAccessFile indexReader = new RandomAccessFile(new File(directory + INDEX_FILE_NAME), "r"); // todo
+        Column primaryCol = getPrimary(tableName);
+
+        int tableRowCount = getTableRowCount(tableName);
+
+        for (int i = 0; i < tableRowCount; i++) {
+            boolean deleted = indexReader.readBoolean();
+            double value = indexReader.readDouble();
+
+            if (value == wantedPrimary) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+//    public static void editNthRowIndex(String tableName , int n) throws IOException {
+//        String directory = "Tables/" + tableName + "/" ;
+//        RandomAccessFile writer = new RandomAccessFile(new File(directory+INDEX_FILE_NAME), "rw");
+//        writer.seek(writer.length());
+//    }
 
     public static void writeSchemaToFile(String fileName, String primary, ArrayList<Column> cols) throws FileNotFoundException {
         PrintWriter out = new PrintWriter(fileName);

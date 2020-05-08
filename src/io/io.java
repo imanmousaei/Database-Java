@@ -3,6 +3,7 @@ package io;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Scanner;
 
 import model.*;
@@ -41,7 +42,7 @@ public class io {
             System.out.println("Row Inserted Successfully.");
         }
         else if (command.equals(DELETE)) {
-            // todo
+            deleteRow(tableName, obj);
         }
         else if (command.equals(EDIT)) {
             // todo
@@ -54,6 +55,26 @@ public class io {
         }
 
 
+    }
+
+    private static void deleteRow(String tableName, JsonObject obj) throws IOException {
+        String directory = "Tables/" + tableName + "/";
+        RandomAccessFile writer = new RandomAccessFile(new File(directory + INDEX_FILE_NAME), "rw");
+        Column primaryCol = getPrimary(tableName);
+        int indexRowSize = primaryCol.getSize() + 1; // bool deleted : 1 Byte
+
+        if(primaryCol.getType().equals(STRING)) {
+            String wantedPrimary = obj.getString(primaryCol.getName());
+            int index = getIndex(tableName, wantedPrimary);
+            writer.seek(index * indexRowSize);
+        }
+        else{
+            double wantedPrimary = obj.getDouble(primaryCol.getName());
+            int index = getIndex(tableName, wantedPrimary);
+            writer.seek(index * indexRowSize);
+        }
+
+        writer.writeBoolean(true); // deleted = true
     }
 
     private static void insertToTable(String tableName, JsonObject obj) throws IOException {
@@ -75,7 +96,6 @@ public class io {
                 appendToFile(directory + DB_FILE_NAME, value);
 
                 if (columnName.equals(primary)) {
-//                addPrimaryIndex();
                     appendToFile(directory + INDEX_FILE_NAME, false); // deleted = false
                     appendToFile(directory + INDEX_FILE_NAME, value);
                 }
@@ -89,12 +109,10 @@ public class io {
                 appendToFile(directory + DB_FILE_NAME, value);
 
                 if (columnName.equals(primary)) {
-//                addPrimaryIndex();
-                    appendToFile(directory + INDEX_FILE_NAME, false);
+                    appendToFile(directory + INDEX_FILE_NAME, false); // deleted = false
                     appendToFile(directory + INDEX_FILE_NAME, value);
                 }
             }
-//            appendToFile(directory + DB_FILE_NAME, "\n");
         }
         schemaScanner.close();
     }
@@ -103,17 +121,23 @@ public class io {
         String directory = "Tables/" + tableName + "/";
 
         RandomAccessFile dbReader = new RandomAccessFile(new File(directory + DB_FILE_NAME), "r");
+        RandomAccessFile indexReader = new RandomAccessFile(new File(directory + INDEX_FILE_NAME), "r");
 
         int tableRowCount = getTableRowCount(tableName);
 
         for (int i = 0; i < tableRowCount; i++) {
             Scanner schemaScanner = new Scanner(new File(directory + SCHEMA_FILE_NAME));
-            String primary = schemaScanner.next();
+            Column primaryCol = new Column(schemaScanner.next());
 
             while (schemaScanner.hasNext()) {
                 String columnName = schemaScanner.next();
                 String type = schemaScanner.next();
                 int size = schemaScanner.nextInt();
+
+                if (columnName.equals(primaryCol.getName())) {
+                    primaryCol.setType(type);
+                    primaryCol.setSize(size);
+                }
 
                 if (type.equals(DOUBLE)) {
                     double value = dbReader.readDouble();
@@ -128,15 +152,24 @@ public class io {
             }
             schemaScanner.close();
             out.println();
+
+            // print index file
+
+            boolean deleted = indexReader.readBoolean();
+            out.print(deleted + " ");
+
+            if (primaryCol.getType().equals(DOUBLE)) {
+                double value = indexReader.readDouble();
+                out.print(value + " ");
+            }
+            else if (primaryCol.getType().equals(STRING)) {
+                byte[] b = new byte[primaryCol.getSize()];
+                indexReader.readFully(b);
+                String value = new String(b, StandardCharsets.UTF_8);
+                out.print(value + " ");
+            }
+            out.println();
         }
-    }
-
-    private static void addPrimaryIndex() {
-        // todo : add it in the first null row
-    }
-
-    private static int getIndex(String primary) { // O(n)
-        return -1;
     }
 
     private static void createTable(String tableName, String primary, ArrayList<Column> cols) throws IOException {
