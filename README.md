@@ -134,6 +134,6 @@
 ## Exit Command Line :
 ```
 {
-    "Command" : "Exit" ,
+    "Command" : "Exit"
 }
 ```
