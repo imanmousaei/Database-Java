@@ -7,9 +7,6 @@ public class Main {
     public static void main(String[] args) throws IOException {
         while(true) {
             String input = readJSONObject(System.in);
-            if(input.equals(EXIT)){
-                break;
-            }
             processInput(input);
         }
     }

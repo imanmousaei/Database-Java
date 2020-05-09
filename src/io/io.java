@@ -35,6 +35,12 @@ public class io {
         obj.trimInput();
         obj.processInput();
         String command = obj.getString(COMMAND);
+
+        if(command.equals(EXIT)){
+            System.exit(0);
+        }
+
+
         String tableName = obj.getString(TABLE);
 
         if (command.equals(CREATE_TABLE)) {
