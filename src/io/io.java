@@ -36,10 +36,9 @@ public class io {
         obj.processInput();
         String command = obj.getString(COMMAND);
 
-        if(command.equals(EXIT)){
+        if (command.equals(EXIT)) {
             System.exit(0);
         }
-
 
         String tableName = obj.getString(TABLE);
 
@@ -51,21 +50,24 @@ public class io {
         }
         else if (command.equals(INSERT)) {
             insertToTable(tableName, obj.getObject(DATA));
+            cacheAllRows(tableName);
             System.out.println("Row Inserted Successfully.");
         }
         else if (command.equals(DELETE)) {
             deleteRow(tableName, obj);
+            cacheAllRows(tableName);
             System.out.println("Row Deleted Successfully.");
         }
         else if (command.equals(EDIT)) {
-            // todo
+            // todo edit row
+            cacheAllRows(tableName);
+            System.out.println("Row Deleted Successfully.");
         }
         else if (command.equals(SEARCH)) {
-            cacheAllRows(tableName);
             // todo
+            filter()
         }
         else if (command.equals(SHOW_TABLE)) {
-            cacheAllRows(tableName);
             showTable(tableName, System.out);
         }
     }
@@ -174,21 +176,41 @@ public class io {
         // todo insert in the first null row
         // todo check if the primary already exists
         String directory = "Tables/" + tableName + "/";
+        Column primaryCol = getPrimary(tableName);
 
-        Scanner schemaScanner = new Scanner(new File(directory + SCHEMA_FILE_NAME));
+        RandomAccessFile indexWriter = new RandomAccessFile(new File(directory + INDEX_FILE_NAME), "rw");
+        int indexRowSize = primaryCol.getSize() + 1; // bool deleted : 1 Byte
+        indexWriter.seek(firstDeletedRowIndex(tableName) * indexRowSize);
 
-        String primary = schemaScanner.next();
+        indexWriter.writeBoolean(false); // deleted = false
 
-        while (schemaScanner.hasNext()) {
-            String columnName = schemaScanner.next();
-            String type = schemaScanner.next();
-            int size = schemaScanner.nextInt();
+        if (primaryCol.getType().equals(DOUBLE)) {
+            double value = obj.getDouble(primaryCol.getName());
+            indexWriter.writeDouble(value);
+
+        }
+        else {
+            String value = obj.getString(primaryCol.getName());
+            while (value.length() < primaryCol.getSize()) {
+                value = value.concat(" ");
+            }
+            byte[] b = value.getBytes();
+            indexWriter.write(b);
+        }
+
+
+
+
+        for (Column col : allColumns.get(tableName)) {
+            String columnName = col.getName();
+            String type = col.getType();
+            int size = col.getSize();
 
             if (type.equals(DOUBLE)) {
                 double value = obj.getDouble(columnName);
                 appendToFile(directory + DB_FILE_NAME, value);
 
-                if (columnName.equals(primary)) {
+                if (columnName.equals(primaryCol.getName())) {
                     appendToFile(directory + INDEX_FILE_NAME, false); // deleted = false
                     appendToFile(directory + INDEX_FILE_NAME, value);
                 }
@@ -201,13 +223,23 @@ public class io {
                 }
                 appendToFile(directory + DB_FILE_NAME, value);
 
-                if (columnName.equals(primary)) {
+                if (columnName.equals(primaryCol.getName())) {
                     appendToFile(directory + INDEX_FILE_NAME, false); // deleted = false
                     appendToFile(directory + INDEX_FILE_NAME, value);
                 }
             }
         }
-        schemaScanner.close();
+    }
+
+    private static int firstDeletedRowIndex(String tableName) {
+        int index = 0;
+        for (MinimalRow<?> row : allMinimalRows.get(tableName)) {
+            if (row.isDeleted()) {
+                return index;
+            }
+            index++;
+        }
+        return index;
     }
 
     private static void cacheAllColumns(String tableName) throws IOException {
@@ -216,7 +248,7 @@ public class io {
                 return;
             }
         }
-        catch (NullPointerException e){
+        catch (NullPointerException e) {
 
         }
 
