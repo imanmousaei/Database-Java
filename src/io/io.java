@@ -15,6 +15,7 @@ import static io.Strings.*;
 public class io {
     public static HashMap<String, ArrayList<Row>> allRows = new HashMap<>();
     public static HashMap<String, ArrayList<Column>> allColumns = new HashMap<>();
+    public static HashMap<String, ArrayList<MinimalRow<?>>> allMinimalRows = new HashMap<>();
 
     public static String readJSONObject(InputStream in) {
         Scanner scanner = new Scanner(in);
@@ -61,8 +62,6 @@ public class io {
             cacheAllRows(tableName);
             showTable(tableName, System.out);
         }
-
-
     }
 
     private static void cacheAllRows(String tableName) throws IOException {
@@ -105,6 +104,32 @@ public class io {
         allRows.put(tableName, rows);
         dbReader.close();
         indexReader.close();
+    }
+
+    private static void cacheAllMinimalRows(String tableName) throws IOException {
+        String directory = "Tables/" + tableName + "/";
+
+        RandomAccessFile dbReader = new RandomAccessFile(new File(directory + DB_FILE_NAME), "r");
+        RandomAccessFile indexReader = new RandomAccessFile(new File(directory + INDEX_FILE_NAME), "r");
+
+        Column primaryCol = getPrimary(tableName);
+        boolean deleted = indexReader.readBoolean();
+        int rowCount = getTableRowCount(tableName);
+        ArrayList<MinimalRow<?>> minimalRows = new ArrayList<>();
+
+        for (int i = 0; i < rowCount; i++) {
+            if (primaryCol.getType().equals(DOUBLE)) {
+                double value = indexReader.readDouble();
+                minimalRows.add(new MinimalRow<Double>(value, deleted));
+            }
+            else if (primaryCol.getType().equals(STRING)) {
+                byte[] b = new byte[primaryCol.getSize()];
+                indexReader.readFully(b);
+                String value = new String(b, StandardCharsets.UTF_8);
+                minimalRows.add(new MinimalRow<String>(value, deleted));
+            }
+        }
+        allMinimalRows.put(tableName, minimalRows);
     }
 
     private static void deleteRow(String tableName, JsonObject obj) throws IOException {
@@ -194,14 +219,14 @@ public class io {
             String columnName = schemaScanner.next();
             String type = schemaScanner.next();
             int size = schemaScanner.nextInt();
-            if(columnName.equals(primary)){
-                cols.add(new Column(columnName,type,size,true));
+            if (columnName.equals(primary)) {
+                cols.add(new Column(columnName, type, size, true));
             }
-            else{
-                cols.add(new Column(columnName,type,size,false));
+            else {
+                cols.add(new Column(columnName, type, size, false));
             }
         }
-        allColumns.put(tableName,cols);
+        allColumns.put(tableName, cols);
         schemaScanner.close();
     }
 
@@ -211,6 +236,7 @@ public class io {
             out.println(row.toString());
         }
     }
+
 
     private static void createTable(String tableName, String primary, ArrayList<Column> cols) throws IOException {
         createFolder("Tables/" + tableName);
