@@ -3,7 +3,6 @@ package io;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Scanner;
 
 import model.*;
@@ -13,6 +12,8 @@ import static io.FileIO.*;
 import static io.Strings.*;
 
 public class io {
+    public static ArrayList<Row> allRows = new ArrayList<>();
+
     public static String readJSONObject(InputStream in) {
         Scanner scanner = new Scanner(in);
         String nextLine = scanner.nextLine();
@@ -77,6 +78,16 @@ public class io {
 
         writer.writeBoolean(true); // deleted = true
     }
+
+    public static ArrayList<Row> filter(Filterable obj){
+        ArrayList<Row> wantedRows = new ArrayList<>();
+        for(Row r : allRows){
+            if(obj.isAcceptable(r)){
+                wantedRows.add(r);
+            }
+        }
+    }
+
 
     private static void insertToTable(String tableName, JsonObject obj) throws IOException {
         // inserts in the last row
