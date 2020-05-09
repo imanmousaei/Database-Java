@@ -130,3 +130,8 @@
     "Table" : "testTable"
 }
 ```
+
+## Exit Command Line :
+```
+{exit}
+```
