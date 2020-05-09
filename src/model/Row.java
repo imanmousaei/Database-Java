@@ -24,7 +24,7 @@ public class Row {
 
     @Override
     public String toString() {
-        String tmp = deleted + " ";
+        String tmp = deleted + "  ";
         for(Cell<?> cell : cells){
             tmp = tmp.concat(cell.toString());
         }

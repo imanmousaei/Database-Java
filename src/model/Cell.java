@@ -15,6 +15,9 @@ public class Cell<T> {
 
     @Override
     public String toString() {
-        return value + " ";
+        if(value instanceof String){
+            return ((String) value).trim() + "  ";
+        }
+        return value + "  ";
     }
 }

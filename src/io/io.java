@@ -180,9 +180,9 @@ public class io {
     }
 
     private static void cacheAllColumns(String tableName) throws IOException {
-        if(!allColumns.get(tableName).isEmpty()){
-            return;
-        }
+//        if(!allColumns.get(tableName).isEmpty()){
+//            return;
+//        }
 
         String directory = "Tables/" + tableName + "/";
         Scanner schemaScanner = new Scanner(new File(directory + SCHEMA_FILE_NAME));
