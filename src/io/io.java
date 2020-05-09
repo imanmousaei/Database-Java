@@ -3,6 +3,7 @@ package io;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 
 import model.*;
@@ -12,7 +13,8 @@ import static io.FileIO.*;
 import static io.Strings.*;
 
 public class io {
-    public static ArrayList<Row> allRows = new ArrayList<>();
+    public static HashMap<String, ArrayList<Row>> allRows = new HashMap<>();
+    public static HashMap<String, ArrayList<Column>> allColumns = new HashMap<>();
 
     public static String readJSONObject(InputStream in) {
         Scanner scanner = new Scanner(in);
@@ -35,7 +37,9 @@ public class io {
         String tableName = obj.getString(TABLE);
 
         if (command.equals(CREATE_TABLE)) {
-            createTable(tableName, obj.getString(PRIMARY), extractColumnFromJson(obj));
+            String primary = obj.getString(PRIMARY);
+            cacheAllColumnsFromJson(tableName, primary, obj);
+            createTable(tableName, primary, allColumns.get(tableName));
             System.out.println("Table Created Successfully.");
         }
         else if (command.equals(INSERT)) {
@@ -50,13 +54,57 @@ public class io {
             // todo
         }
         else if (command.equals(SEARCH)) {
+            cacheAllRows(tableName);
             // todo
         }
         else if (command.equals(SHOW_TABLE)) {
+            cacheAllRows(tableName);
             showTable(tableName, System.out);
         }
 
 
+    }
+
+    private static void cacheAllRows(String tableName) throws IOException {
+        cacheAllColumns(tableName);
+        String directory = "Tables/" + tableName + "/";
+
+        RandomAccessFile dbReader = new RandomAccessFile(new File(directory + DB_FILE_NAME), "r");
+        RandomAccessFile indexReader = new RandomAccessFile(new File(directory + INDEX_FILE_NAME), "r");
+
+        int tableRowCount = getTableRowCount(tableName);
+        Column primaryCol = null;
+        ArrayList<Row> rows = new ArrayList<>();
+
+        for (int i = 0; i < tableRowCount; i++) {
+            ArrayList<Column> cols = allColumns.get(tableName);
+            Row row = new Row();
+
+            for (Column col : cols) {
+                if (col.isPrimary()) {
+                    primaryCol = new Column(col.getName(), col.getType(), col.getSize());
+                }
+
+                if (col.getType().equals(DOUBLE)) {
+                    double value = dbReader.readDouble();
+                    row.addCell(new Cell<Double>(value));
+                }
+                else if (col.getType().equals(STRING)) {
+                    byte[] b = new byte[col.getSize()];
+                    dbReader.readFully(b);
+                    String value = new String(b, StandardCharsets.UTF_8);
+                    row.addCell(new Cell<String>(value));
+                }
+            }
+            // index file
+            indexReader.seek(i * primaryCol.getSize());
+            boolean deleted = indexReader.readBoolean();
+            row.setDeleted(deleted);
+            rows.add(row);
+        }
+        allRows.put(tableName, rows);
+        dbReader.close();
+        indexReader.close();
     }
 
     private static void deleteRow(String tableName, JsonObject obj) throws IOException {
@@ -79,13 +127,14 @@ public class io {
         writer.writeBoolean(true); // deleted = true
     }
 
-    public static ArrayList<Row> filter(Filterable obj){
+    public static ArrayList<Row> filter(String tableName, Filterable obj) {
         ArrayList<Row> wantedRows = new ArrayList<>();
-        for(Row r : allRows){
-            if(obj.isAcceptable(r)){
+        for (Row r : allRows.get(tableName)) {
+            if (obj.isAcceptable(r)) {
                 wantedRows.add(r);
             }
         }
+        return wantedRows;
     }
 
 
@@ -130,58 +179,36 @@ public class io {
         schemaScanner.close();
     }
 
-    private static void showTable(String tableName, PrintStream out) throws IOException {
+    private static void cacheAllColumns(String tableName) throws IOException {
+        if(!allColumns.get(tableName).isEmpty()){
+            return;
+        }
+
         String directory = "Tables/" + tableName + "/";
+        Scanner schemaScanner = new Scanner(new File(directory + SCHEMA_FILE_NAME));
 
-        RandomAccessFile dbReader = new RandomAccessFile(new File(directory + DB_FILE_NAME), "r");
-        RandomAccessFile indexReader = new RandomAccessFile(new File(directory + INDEX_FILE_NAME), "r");
+        ArrayList<Column> cols = new ArrayList<>();
+        String primary = schemaScanner.next();
 
-        int tableRowCount = getTableRowCount(tableName);
-
-        for (int i = 0; i < tableRowCount; i++) {
-            Scanner schemaScanner = new Scanner(new File(directory + SCHEMA_FILE_NAME));
-            Column primaryCol = new Column(schemaScanner.next());
-
-            while (schemaScanner.hasNext()) {
-                String columnName = schemaScanner.next();
-                String type = schemaScanner.next();
-                int size = schemaScanner.nextInt();
-
-                if (columnName.equals(primaryCol.getName())) {
-                    primaryCol.setType(type);
-                    primaryCol.setSize(size);
-                }
-
-                if (type.equals(DOUBLE)) {
-                    double value = dbReader.readDouble();
-                    out.print(value + "  ");
-                }
-                else if (type.equals(STRING)) {
-                    byte[] b = new byte[size];
-                    dbReader.readFully(b);
-                    String value = new String(b, StandardCharsets.UTF_8);
-                    out.print(value.trim() + "  ");
-                }
+        while (schemaScanner.hasNext()) {
+            String columnName = schemaScanner.next();
+            String type = schemaScanner.next();
+            int size = schemaScanner.nextInt();
+            if(columnName.equals(primary)){
+                cols.add(new Column(columnName,type,size,true));
             }
-            schemaScanner.close();
-
-            // print index file
-
-            boolean deleted = indexReader.readBoolean();
-            out.print(deleted);
-            out.println();
-
-            if (primaryCol.getType().equals(DOUBLE)) {
-                double value = indexReader.readDouble();
-//                out.print(value + " ");
+            else{
+                cols.add(new Column(columnName,type,size,false));
             }
-            else if (primaryCol.getType().equals(STRING)) {
-                byte[] b = new byte[primaryCol.getSize()];
-                indexReader.readFully(b);
-                String value = new String(b, StandardCharsets.UTF_8);
-//                out.print(value + " ");
-            }
-//            out.println();
+        }
+        allColumns.put(tableName,cols);
+        schemaScanner.close();
+    }
+
+    private static void showTable(String tableName, PrintStream out) throws IOException {
+        cacheAllColumns(tableName);
+        for (Row row : allRows.get(tableName)) {
+            out.println(row.toString());
         }
     }
 
@@ -195,7 +222,7 @@ public class io {
         createFile(directory + INDEX_FILE_NAME);
     }
 
-    private static ArrayList<Column> extractColumnFromJson(JsonObject jsonObject) {
+    private static void cacheAllColumnsFromJson(String tableName, String primary, JsonObject jsonObject) {
         ArrayList<Column> cols = new ArrayList<>();
         ArrayList<JsonValue<?>> jsonCols = jsonObject.getArrayList(COLUMNS);
         for (JsonValue<?> jsonValueCol : jsonCols) {
@@ -211,9 +238,14 @@ public class io {
             else {
                 c = new Column(colObj.getString(COLUMN_NAME), colObj.getString(TYPE));
             }
+
+            if (c.getName().equals(primary)) {
+                c.setPrimary(true);
+            }
+
             cols.add(c);
         }
-        return cols;
+        allColumns.put(tableName, cols);
     }
 
 

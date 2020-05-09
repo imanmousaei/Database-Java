@@ -4,9 +4,17 @@ public class Column {
     private String name;
     private String type;
     private int size;
+    private boolean isPrimaryKey = false;
 
     public Column(String name) {
         this.name = name;
+    }
+
+    public Column(String name, String type, int size, boolean isPrimaryKey) {
+        this.name = name;
+        this.type = type;
+        this.size = size;
+        this.isPrimaryKey = isPrimaryKey;
     }
 
     public Column(String name, String type, int size) {
@@ -44,6 +52,14 @@ public class Column {
 
     public void setSize(int size) {
         this.size = size;
+    }
+
+    public boolean isPrimary() {
+        return isPrimaryKey;
+    }
+
+    public void setPrimary(boolean primaryKey) {
+        isPrimaryKey = primaryKey;
     }
 
     @Override
