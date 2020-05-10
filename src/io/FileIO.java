@@ -107,24 +107,33 @@ public class FileIO {
         out.close();
     }
 
-    public static void appendToFile(String fileName, String textToAppend) throws IOException { // appends in  binary format
+    public static void appendToFileNthByte(String fileName, String textToAppend,long n) throws IOException { // appends in  binary format
         RandomAccessFile writer = new RandomAccessFile(new File(fileName), "rw");
-        writer.seek(writer.length());
+        if(n==-1){
+            n = writer.length();
+        }
+        writer.seek(n);
         byte[] b = textToAppend.getBytes();
         writer.write(b);
         writer.close();
     }
 
-    public static void appendToFile(String fileName, boolean bool) throws IOException { // appends in  binary format
+    public static void appendToFileNthByte(String fileName, boolean bool,long n) throws IOException { // appends in  binary format
         RandomAccessFile writer = new RandomAccessFile(new File(fileName), "rw");
-        writer.seek(writer.length());
+        if(n==-1){
+            n = writer.length();
+        }
+        writer.seek(n);
         writer.writeBoolean(bool);
         writer.close();
     }
 
-    public static void appendToFile(String fileName, double numberToAppend) throws IOException { // appends in  binary format
+    public static void appendToFileNthByte(String fileName, double numberToAppend,long n) throws IOException { // appends in  binary format
         RandomAccessFile writer = new RandomAccessFile(new File(fileName), "rw");
-        writer.seek(writer.length());
+        if(n==-1){
+            n = writer.length();
+        }
+        writer.seek(n);
         writer.writeDouble(numberToAppend);
         writer.close();
     }

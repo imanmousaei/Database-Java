@@ -198,8 +198,7 @@ public class io {
             indexWriter.write(b);
         }
 
-
-
+        int rowSize = getRowSizeInByte(tableName);
 
         for (Column col : allColumns.get(tableName)) {
             String columnName = col.getName();
@@ -208,12 +207,7 @@ public class io {
 
             if (type.equals(DOUBLE)) {
                 double value = obj.getDouble(columnName);
-                appendToFile(directory + DB_FILE_NAME, value);
-
-                if (columnName.equals(primaryCol.getName())) {
-                    appendToFile(directory + INDEX_FILE_NAME, false); // deleted = false
-                    appendToFile(directory + INDEX_FILE_NAME, value);
-                }
+                appendToFileNthByte(directory + DB_FILE_NAME, value);
 
             }
             else if (type.equals(STRING)) {
@@ -221,12 +215,7 @@ public class io {
                 while (value.length() < size) {
                     value = value.concat(" ");
                 }
-                appendToFile(directory + DB_FILE_NAME, value);
-
-                if (columnName.equals(primaryCol.getName())) {
-                    appendToFile(directory + INDEX_FILE_NAME, false); // deleted = false
-                    appendToFile(directory + INDEX_FILE_NAME, value);
-                }
+                appendToFileNthByte(directory + DB_FILE_NAME, value);
             }
         }
     }
