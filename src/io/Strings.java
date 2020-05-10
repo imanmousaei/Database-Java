@@ -2,7 +2,7 @@ package io;
 
 import java.security.cert.Extension;
 
-public class Strings {
+public class Strings { // bad name
     // Commands :
     public static final String CREATE_TABLE = "CreateTable";
     public static final String INSERT = "Insert";
