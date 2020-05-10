@@ -11,7 +11,7 @@ import model.JSON.*;
 
 import static io.FileIO.*;
 import static io.Strings.*;
-
+// why everything is static ??
 public class io {
     public static HashMap<String, ArrayList<Row>> allRows = new HashMap<>();
     public static HashMap<String, ArrayList<Column>> allColumns = new HashMap<>();
@@ -46,7 +46,7 @@ public class io {
             String primary = obj.getString(PRIMARY);
             cacheAllColumnsFromJson(tableName, primary, obj);
             createTable(tableName, primary, allColumns.get(tableName));
-            System.out.println("Table Created Successfully.");
+            System.out.println("Table Created Successfully.");// print this as json ex: {"status": "ok", "message": "Table Created Successfully."}
         }
         else if (command.equals(INSERT)) {
             insertToTable(tableName, obj.getObject(DATA));
@@ -72,7 +72,7 @@ public class io {
         }
     }
 
-    private static void cacheAllRows(String tableName) throws IOException {
+    private static void cacheAllRows(String tableName) throws IOException {// bad name
         cacheAllColumns(tableName);
         String directory = "Tables/" + tableName + "/";
 
@@ -140,7 +140,8 @@ public class io {
         allMinimalRows.put(tableName, minimalRows);
     }
 
-    private static void deleteRow(String tableName, JsonObject obj) throws IOException {
+    private static void deleteRow(String tableName, JsonObject obj) throws IOException {//  this function must be in Engine class
+         // It's good that you didn't delete the data in the DB file (+ point)
         String directory = "Tables/" + tableName + "/";
         RandomAccessFile writer = new RandomAccessFile(new File(directory + INDEX_FILE_NAME), "rw");
         Column primaryCol = getPrimary(tableName);
@@ -171,10 +172,10 @@ public class io {
     }
 
 
-    private static void insertToTable(String tableName, JsonObject obj) throws IOException {
+    private static void insertToTable(String tableName, JsonObject obj) throws IOException { //  this function must be in Engine class
         // inserts in the last row
         // todo insert in the first null row
-        // todo check if the primary already exists
+        // todo check if the primary already exists (validation Responsibility)
         String directory = "Tables/" + tableName + "/";
         Column primaryCol = getPrimary(tableName);
 
@@ -182,9 +183,9 @@ public class io {
         int indexRowSize = primaryCol.getSize() + 1; // bool deleted : 1 Byte
         indexWriter.seek(firstDeletedRowIndex(tableName) * indexRowSize);
 
-        indexWriter.writeBoolean(false); // deleted = false
+        indexWriter.writeBoolean(false); // deleted = false // good
 
-        if (primaryCol.getType().equals(DOUBLE)) {
+        if (primaryCol.getType().equals(DOUBLE)) { // What to do if there is int type?
             double value = obj.getDouble(primaryCol.getName());
             indexWriter.writeDouble(value);
 
@@ -205,7 +206,7 @@ public class io {
             String type = col.getType();
             int size = col.getSize();
 
-            if (type.equals(DOUBLE)) {
+            if (type.equals(DOUBLE)) {// What to do if there is int type?
                 double value = obj.getDouble(columnName);
                 appendToFileNthByte(directory + DB_FILE_NAME, value);
 
@@ -220,7 +221,7 @@ public class io {
         }
     }
 
-    private static int firstDeletedRowIndex(String tableName) {
+    private static int firstDeletedRowIndex(String tableName) { // bad name ... // this function must be in Engine class
         int index = 0;
         for (MinimalRow<?> row : allMinimalRows.get(tableName)) {
             if (row.isDeleted()) {
@@ -231,7 +232,7 @@ public class io {
         return index;
     }
 
-    private static void cacheAllColumns(String tableName) throws IOException {
+    private static void cacheAllColumns(String tableName) throws IOException {//  this function must be in Engine class
         try {
             if (!allColumns.get(tableName).isEmpty()) {
                 return;
@@ -271,8 +272,8 @@ public class io {
     }
 
 
-    private static void createTable(String tableName, String primary, ArrayList<Column> cols) throws IOException {
-        createFolder("Tables/" + tableName);
+    private static void createTable(String tableName, String primary, ArrayList<Column> cols) throws IOException {// this function must be in Engine class
+        createFolder("Tables/" + tableName);// check if "tables" folder exists 
 
         String directory = "Tables/" + tableName + "/";
 
@@ -292,7 +293,8 @@ public class io {
             JsonObject colObj = (JsonObject) jsonValueCol;
             Column c;
             if (colObj.getString(TYPE).equals(STRING)) {
-                c = new Column(colObj.getString(COLUMN_NAME), colObj.getString(TYPE), colObj.getInt(LENGTH));
+                // extra hint: try factory design pattern  or builder desgin pattern
+                c = new Column(colObj.getString(COLUMN_NAME), colObj.getString(TYPE), colObj.getInt(LENGTH)); 
             }
             else {
                 c = new Column(colObj.getString(COLUMN_NAME), colObj.getString(TYPE));
