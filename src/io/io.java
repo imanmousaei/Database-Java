@@ -9,8 +9,11 @@ import java.util.Scanner;
 import model.*;
 import model.JSON.*;
 
+
+import static Engine.Engine.*;
 import static io.FileIO.*;
 import static io.Strings.*;
+
 // why everything is static ??
 public class io {
     public static HashMap<String, ArrayList<Row>> allRows = new HashMap<>();
@@ -140,146 +143,11 @@ public class io {
         allMinimalRows.put(tableName, minimalRows);
     }
 
-    private static void deleteRow(String tableName, JsonObject obj) throws IOException {//  this function must be in Engine class
-         // It's good that you didn't delete the data in the DB file (+ point)
-        String directory = "Tables/" + tableName + "/";
-        RandomAccessFile writer = new RandomAccessFile(new File(directory + INDEX_FILE_NAME), "rw");
-        Column primaryCol = getPrimary(tableName);
-        int indexRowSize = primaryCol.getSize() + 1; // bool deleted : 1 Byte
-
-        if (primaryCol.getType().equals(STRING)) {
-            String wantedPrimary = obj.getString(primaryCol.getName());
-            int index = getIndex(tableName, wantedPrimary);
-            writer.seek(index * indexRowSize);
-        }
-        else {
-            double wantedPrimary = obj.getDouble(primaryCol.getName());
-            int index = getIndex(tableName, wantedPrimary);
-            writer.seek(index * indexRowSize);
-        }
-
-        writer.writeBoolean(true); // deleted = true
-    }
-
-    public static ArrayList<Row> filter(String tableName, Filterable obj) {
-        ArrayList<Row> wantedRows = new ArrayList<>();
-        for (Row r : allRows.get(tableName)) {
-            if (obj.isAcceptable(r)) {
-                wantedRows.add(r);
-            }
-        }
-        return wantedRows;
-    }
-
-
-    private static void insertToTable(String tableName, JsonObject obj) throws IOException { //  this function must be in Engine class
-        // inserts in the last row
-        // todo insert in the first null row
-        // todo check if the primary already exists (validation Responsibility)
-        String directory = "Tables/" + tableName + "/";
-        Column primaryCol = getPrimary(tableName);
-
-        RandomAccessFile indexWriter = new RandomAccessFile(new File(directory + INDEX_FILE_NAME), "rw");
-        int indexRowSize = primaryCol.getSize() + 1; // bool deleted : 1 Byte
-        indexWriter.seek(firstDeletedRowIndex(tableName) * indexRowSize);
-
-        indexWriter.writeBoolean(false); // deleted = false // good
-
-        if (primaryCol.getType().equals(DOUBLE)) { // What to do if there is int type?
-            double value = obj.getDouble(primaryCol.getName());
-            indexWriter.writeDouble(value);
-
-        }
-        else {
-            String value = obj.getString(primaryCol.getName());
-            while (value.length() < primaryCol.getSize()) {
-                value = value.concat(" ");
-            }
-            byte[] b = value.getBytes();
-            indexWriter.write(b);
-        }
-
-        int rowSize = getRowSizeInByte(tableName);
-
-        for (Column col : allColumns.get(tableName)) {
-            String columnName = col.getName();
-            String type = col.getType();
-            int size = col.getSize();
-
-            if (type.equals(DOUBLE)) {// What to do if there is int type?
-                double value = obj.getDouble(columnName);
-                appendToFileNthByte(directory + DB_FILE_NAME, value);
-
-            }
-            else if (type.equals(STRING)) {
-                String value = obj.getString(columnName);
-                while (value.length() < size) {
-                    value = value.concat(" ");
-                }
-                appendToFileNthByte(directory + DB_FILE_NAME, value);
-            }
-        }
-    }
-
-    private static int firstDeletedRowIndex(String tableName) { // bad name ... // this function must be in Engine class
-        int index = 0;
-        for (MinimalRow<?> row : allMinimalRows.get(tableName)) {
-            if (row.isDeleted()) {
-                return index;
-            }
-            index++;
-        }
-        return index;
-    }
-
-    private static void cacheAllColumns(String tableName) throws IOException {//  this function must be in Engine class
-        try {
-            if (!allColumns.get(tableName).isEmpty()) {
-                return;
-            }
-        }
-        catch (NullPointerException e) {
-
-        }
-
-
-        String directory = "Tables/" + tableName + "/";
-        Scanner schemaScanner = new Scanner(new File(directory + SCHEMA_FILE_NAME));
-
-        ArrayList<Column> cols = new ArrayList<>();
-        String primary = schemaScanner.next();
-
-        while (schemaScanner.hasNext()) {
-            String columnName = schemaScanner.next();
-            String type = schemaScanner.next();
-            int size = schemaScanner.nextInt();
-            if (columnName.equals(primary)) {
-                cols.add(new Column(columnName, type, size, true));
-            }
-            else {
-                cols.add(new Column(columnName, type, size, false));
-            }
-        }
-        allColumns.put(tableName, cols);
-        schemaScanner.close();
-    }
-
     private static void showTable(String tableName, PrintStream out) throws IOException {
         cacheAllColumns(tableName);
         for (Row row : allRows.get(tableName)) {
             out.println(row.toString());
         }
-    }
-
-
-    private static void createTable(String tableName, String primary, ArrayList<Column> cols) throws IOException {// this function must be in Engine class
-        createFolder("Tables/" + tableName);// check if "tables" folder exists 
-
-        String directory = "Tables/" + tableName + "/";
-
-        writeSchemaToFile(directory + SCHEMA_FILE_NAME, primary, cols);
-        createFile(directory + DB_FILE_NAME);
-        createFile(directory + INDEX_FILE_NAME);
     }
 
     private static void cacheAllColumnsFromJson(String tableName, String primary, JsonObject jsonObject) {
@@ -293,7 +161,7 @@ public class io {
             JsonObject colObj = (JsonObject) jsonValueCol;
             Column c;
             if (colObj.getString(TYPE).equals(STRING)) {
-                // extra hint: try factory design pattern  or builder desgin pattern
+                // extra hint: try factory design pattern  or builder design pattern
                 c = new Column(colObj.getString(COLUMN_NAME), colObj.getString(TYPE), colObj.getInt(LENGTH)); 
             }
             else {
