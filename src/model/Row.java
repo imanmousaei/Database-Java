@@ -10,7 +10,7 @@ public class Row {
         return cells.get(index);
     }
 
-    public void addCell(Cell<?> cell){
+    public void addCell(Cell<?> cell) {
         cells.add(cell);
     }
 
@@ -24,10 +24,14 @@ public class Row {
 
     @Override
     public String toString() {
-        String tmp = deleted + "  ";
-        for(Cell<?> cell : cells){
-            tmp = tmp.concat(cell.toString());
+        String str = "{ \"deleted\" : " + deleted + " , ";
+        for (int i = 0; i < cells.size(); i++) {
+            Cell<?> cell = cells.get(i);
+            str = str.concat(cell.toString());
+            if (i + 1 < cells.size()) {
+                str = str.concat(" , ");
+            }
         }
-        return tmp;
+        return str + " }";
     }
 }

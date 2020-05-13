@@ -127,7 +127,7 @@
 ```
 {
     "Command" : "ShowTable" ,
-    "Table" : "testTable"
+    "Table" : "jooon"
 }
 ```
 

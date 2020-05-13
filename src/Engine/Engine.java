@@ -50,10 +50,9 @@ public class Engine {
 
         indexWriter.writeBoolean(false); // deleted = false
 
-        if (primaryCol.getType().equals(DOUBLE)) { // What to do if there is int type?
+        if (primaryCol.getType().equals(DOUBLE)) { // What todo if there is int type?
             double value = obj.getDouble(primaryCol.getName());
             indexWriter.writeDouble(value);
-
         }
         else {
             String value = obj.getString(primaryCol.getName());
@@ -71,21 +70,20 @@ public class Engine {
             String type = col.getType();
             int size = col.getSize();
 
-            if (type.equals(DOUBLE)) {// What to do if there is int type?
-                double value = obj.getDouble(columnName);
-                appendToFileNthByte(directory + DB_FILE_NAME, value);
 
+            if (type.equals(DOUBLE)) {// What todo if there is int type?
+                double value = obj.getDouble(columnName);
+                appendToFileNthByte(directory + DB_FILE_NAME, value, -1);
             }
             else if (type.equals(STRING)) {
                 String value = obj.getString(columnName);
                 while (value.length() < size) {
                     value = value.concat(" ");
                 }
-                appendToFileNthByte(directory + DB_FILE_NAME, value);
+                appendToFileNthByte(directory + DB_FILE_NAME, value, -1);
             }
         }
     }
-
 
 
     public static int firstDeletedRowIndex(String tableName) { // bad name ...

@@ -49,28 +49,29 @@ public class io {
             String primary = obj.getString(PRIMARY);
             cacheAllColumnsFromJson(tableName, primary, obj);
             createTable(tableName, primary, allColumns.get(tableName));
-            System.out.println("Table Created Successfully.");// print this as json ex: {"status": "ok", "message": "Table Created Successfully."}
+            System.out.println("{\"Status\": \"OK\", \"Message\": \"Table Created Successfully.\"}");
         }
         else if (command.equals(INSERT)) {
             insertToTable(tableName, obj.getObject(DATA));
             cacheAllRows(tableName);
-            System.out.println("Row Inserted Successfully.");
+            System.out.println("{\"Status\": \"OK\", \"Message\": \"Row Inserted Successfully.\"}");
         }
         else if (command.equals(DELETE)) {
             deleteRow(tableName, obj);
             cacheAllRows(tableName);
-            System.out.println("Row Deleted Successfully.");
+            System.out.println("{\"Status\": \"OK\", \"Message\": \"Row Deleted Successfully.\"}");
         }
         else if (command.equals(EDIT)) {
             // todo edit row
             cacheAllRows(tableName);
-            System.out.println("Row Deleted Successfully.");
+            System.out.println("{\"Status\": \"OK\", \"Message\": \"Row Updated Successfully.\"}");
         }
         else if (command.equals(SEARCH)) {
             // todo
-            filter()
+//            filter()
         }
         else if (command.equals(SHOW_TABLE)) {
+            cacheAllRows(tableName);
             showTable(tableName, System.out);
         }
     }
@@ -97,13 +98,13 @@ public class io {
 
                 if (col.getType().equals(DOUBLE)) {
                     double value = dbReader.readDouble();
-                    row.addCell(new Cell<Double>(value));
+                    row.addCell(new Cell<Double>(value, col.getName()));
                 }
                 else if (col.getType().equals(STRING)) {
                     byte[] b = new byte[col.getSize()];
                     dbReader.readFully(b);
                     String value = new String(b, StandardCharsets.UTF_8);
-                    row.addCell(new Cell<String>(value));
+                    row.addCell(new Cell<String>(value, col.getName()));
                 }
             }
             // index file
@@ -162,7 +163,7 @@ public class io {
             Column c;
             if (colObj.getString(TYPE).equals(STRING)) {
                 // extra hint: try factory design pattern  or builder design pattern
-                c = new Column(colObj.getString(COLUMN_NAME), colObj.getString(TYPE), colObj.getInt(LENGTH)); 
+                c = new Column(colObj.getString(COLUMN_NAME), colObj.getString(TYPE), colObj.getInt(LENGTH));
             }
             else {
                 c = new Column(colObj.getString(COLUMN_NAME), colObj.getString(TYPE));

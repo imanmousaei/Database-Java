@@ -1,23 +1,31 @@
 package model;
 
+
 public class Cell<T> {
     T value;
     int size;
     String type;
+    String columnName;
 
-    public Cell(T value) {
+
+    public Cell(T value, String columnName) {
         this.value = value;
+        this.columnName = columnName;
     }
 
-    public T getValue(){
+    public T getValue() {
         return value;
     }
 
     @Override
     public String toString() {
-        if(value instanceof String){
-            return ((String) value).trim() + "  ";
+        String str = "\"" + columnName + "\" : ";
+        if (value instanceof String) {
+            str = str.concat("\"" + ((String) value).trim() + "\"");
         }
-        return value + "  ";
+        else {
+            str = str.concat(value.toString());
+        }
+        return str;
     }
 }
