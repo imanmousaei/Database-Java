@@ -52,13 +52,20 @@ public class io {
             System.out.println("{\"Status\": \"OK\", \"Message\": \"Table Created Successfully.\"}");
         }
         else if (command.equals(INSERT)) {
+            try {
+                cacheAllColumns(tableName);
+                cacheAllRows(tableName);
+                cacheAllMinimalRows(tableName);
+            }
+            catch (EOFException eof){
+
+            }
+
             insertToTable(tableName, obj.getObject(DATA));
-            cacheAllRows(tableName);
             System.out.println("{\"Status\": \"OK\", \"Message\": \"Row Inserted Successfully.\"}");
         }
         else if (command.equals(DELETE)) {
             deleteRow(tableName, obj);
-            cacheAllRows(tableName);
             System.out.println("{\"Status\": \"OK\", \"Message\": \"Row Deleted Successfully.\"}");
         }
         else if (command.equals(EDIT)) {
@@ -72,6 +79,7 @@ public class io {
         }
         else if (command.equals(SHOW_TABLE)) {
             cacheAllRows(tableName);
+            cacheAllMinimalRows(tableName);
             showTable(tableName, System.out);
         }
     }
@@ -145,7 +153,6 @@ public class io {
     }
 
     private static void showTable(String tableName, PrintStream out) throws IOException {
-        cacheAllColumns(tableName);
         for (Row row : allRows.get(tableName)) {
             out.println(row.toString());
         }

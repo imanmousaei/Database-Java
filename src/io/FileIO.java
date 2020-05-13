@@ -29,7 +29,9 @@ public class FileIO {
     public static int getTableRowCount(String tableName) throws IOException {
         String fileName = "Tables/" + tableName + "/" + DB_FILE_NAME;
         RandomAccessFile writer = new RandomAccessFile(new File(fileName), "rw");
-        long rowCount = writer.length() / getRowSizeInByte(tableName);
+        long fileLen = writer.length();
+        long rowSize = getRowSizeInByte(tableName);
+        long rowCount = fileLen / rowSize;
         writer.close();
         return (int) rowCount;
     }

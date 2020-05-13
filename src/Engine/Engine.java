@@ -43,10 +43,11 @@ public class Engine {
         // todo check if the primary already exists (validation Responsibility)
         String directory = "Tables/" + tableName + "/";
         Column primaryCol = getPrimary(tableName);
+        int firstDeletedRow = firstDeletedRowIndex(tableName);
 
         RandomAccessFile indexWriter = new RandomAccessFile(new File(directory + INDEX_FILE_NAME), "rw");
         int indexRowSize = primaryCol.getSize() + 1; // bool deleted : 1 Byte
-        indexWriter.seek(firstDeletedRowIndex(tableName) * indexRowSize);
+        indexWriter.seek(firstDeletedRow * indexRowSize);
 
         indexWriter.writeBoolean(false); // deleted = false
 
@@ -64,6 +65,7 @@ public class Engine {
         }
 
         int rowSize = getRowSizeInByte(tableName);
+        int sizeUsed = 0;
 
         for (Column col : allColumns.get(tableName)) {
             String columnName = col.getName();
@@ -73,14 +75,16 @@ public class Engine {
 
             if (type.equals(DOUBLE)) {// What todo if there is int type?
                 double value = obj.getDouble(columnName);
-                appendToFileNthByte(directory + DB_FILE_NAME, value, -1);
+                appendToFileNthByte(directory + DB_FILE_NAME, value, firstDeletedRow * rowSize + sizeUsed);
+                sizeUsed += size;
             }
             else if (type.equals(STRING)) {
                 String value = obj.getString(columnName);
                 while (value.length() < size) {
                     value = value.concat(" ");
                 }
-                appendToFileNthByte(directory + DB_FILE_NAME, value, -1);
+                appendToFileNthByte(directory + DB_FILE_NAME, value, firstDeletedRow * rowSize + sizeUsed);
+                sizeUsed += size;
             }
         }
     }
@@ -88,7 +92,11 @@ public class Engine {
 
     public static int firstDeletedRowIndex(String tableName) { // bad name ...
         int index = 0;
-        for (MinimalRow<?> row : allMinimalRows.get(tableName)) {
+        ArrayList<MinimalRow<?>> minimals = allMinimalRows.get(tableName);
+        if (minimals == null) {
+            return 0;
+        }
+        for (MinimalRow<?> row : minimals) {
             if (row.isDeleted()) {
                 return index;
             }
