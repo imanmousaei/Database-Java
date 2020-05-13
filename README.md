@@ -65,7 +65,7 @@
     } 
 }
 ```
-##### Note : The primary column MUST be in the given Data
+##### Note : All columns MUST be in the given Data
 
 #### Example :
 ```
@@ -73,7 +73,9 @@
     "Command" : "Edit" ,
     "Table" : "testTable" ,
     "Data" : {
+        "name" : "Iman" , 
         "id" : 137 , 
+        "GPA" : 19.29 ,
         "password" : "updatedPassword" 
     } 
 }

@@ -38,54 +38,38 @@ public class Engine {
     }
 
     public static void insertToTable(String tableName, JsonObject obj) throws IOException {
-        // inserts in the last row
-        // todo insert in the first null row
         // todo check if the primary already exists (validation Responsibility)
         String directory = "Tables/" + tableName + "/";
         Column primaryCol = getPrimary(tableName);
         int firstDeletedRow = firstDeletedRowIndex(tableName);
-
-        RandomAccessFile indexWriter = new RandomAccessFile(new File(directory + INDEX_FILE_NAME), "rw");
-        int indexRowSize = primaryCol.getSize() + 1; // bool deleted : 1 Byte
-        indexWriter.seek(firstDeletedRow * indexRowSize);
-
-        indexWriter.writeBoolean(false); // deleted = false
-
-        if (primaryCol.getType().equals(DOUBLE)) { // What todo if there is int type?
-            double value = obj.getDouble(primaryCol.getName());
-            indexWriter.writeDouble(value);
-        }
-        else {
-            String value = obj.getString(primaryCol.getName());
-            while (value.length() < primaryCol.getSize()) {
-                value = value.concat(" ");
-            }
-            byte[] b = value.getBytes();
-            indexWriter.write(b);
-        }
-
-        int rowSize = getRowSizeInByte(tableName);
         int sizeUsed = 0;
 
+        int indexRowSize = primaryCol.getSize() + 1; // bool deleted : 1 Byte
+        appendToFileNthByte(directory + INDEX_FILE_NAME, false, firstDeletedRow * indexRowSize + sizeUsed); // deleted = false
+
+        sizeUsed += 1;
+        insertValue(directory + INDEX_FILE_NAME, obj, firstDeletedRow * indexRowSize + sizeUsed, primaryCol);
+
+        int rowSize = getRowSizeInByte(tableName);
+        sizeUsed = 0;
+
         for (Column col : allColumns.get(tableName)) {
-            String columnName = col.getName();
-            String type = col.getType();
-            int size = col.getSize();
+            insertValue(directory + DB_FILE_NAME, obj, firstDeletedRow * rowSize + sizeUsed, col);
+            sizeUsed += col.getSize();;
+        }
+    }
 
-
-            if (type.equals(DOUBLE)) {// What todo if there is int type?
-                double value = obj.getDouble(columnName);
-                appendToFileNthByte(directory + DB_FILE_NAME, value, firstDeletedRow * rowSize + sizeUsed);
-                sizeUsed += size;
+    private static void insertValue(String fileName, JsonObject obj, long byteToAppend, Column col) throws IOException {
+        if (col.getType().equals(DOUBLE)) { // What todo if there is int type?
+            double value = obj.getDouble(col.getName());
+            appendToFileNthByte(fileName, value, byteToAppend);
+        }
+        else {
+            String value = obj.getString(col.getName());
+            while (value.length() < col.getSize()) {
+                value = value.concat(" ");
             }
-            else if (type.equals(STRING)) {
-                String value = obj.getString(columnName);
-                while (value.length() < size) {
-                    value = value.concat(" ");
-                }
-                appendToFileNthByte(directory + DB_FILE_NAME, value, firstDeletedRow * rowSize + sizeUsed);
-                sizeUsed += size;
-            }
+            appendToFileNthByte(fileName, value, byteToAppend);
         }
     }
 

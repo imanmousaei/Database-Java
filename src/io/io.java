@@ -60,7 +60,6 @@ public class io {
             catch (EOFException eof){
 
             }
-
             insertToTable(tableName, obj.getObject(DATA));
             System.out.println("{\"Status\": \"OK\", \"Message\": \"Row Inserted Successfully.\"}");
         }
@@ -70,7 +69,6 @@ public class io {
         }
         else if (command.equals(EDIT)) {
             // todo edit row
-            cacheAllRows(tableName);
             System.out.println("{\"Status\": \"OK\", \"Message\": \"Row Updated Successfully.\"}");
         }
         else if (command.equals(SEARCH)) {
