@@ -55,7 +55,7 @@ public class FileIO {
 
     public static int getIndex(String tableName, String wantedPrimary) throws IOException { // O(n)
         String directory = "Tables/" + tableName + "/";
-        RandomAccessFile indexReader = new RandomAccessFile(new File(directory + INDEX_FILE_NAME), "r"); // todo
+        RandomAccessFile indexReader = new RandomAccessFile(new File(directory + INDEX_FILE_NAME), "r");
         Column primaryCol = getPrimary(tableName);
 
         int tableRowCount = getTableRowCount(tableName);
@@ -77,7 +77,7 @@ public class FileIO {
 
     public static int getIndex(String tableName, double wantedPrimary) throws IOException { // O(n)
         String directory = "Tables/" + tableName + "/";
-        RandomAccessFile indexReader = new RandomAccessFile(new File(directory + INDEX_FILE_NAME), "r"); // todo
+        RandomAccessFile indexReader = new RandomAccessFile(new File(directory + INDEX_FILE_NAME), "r");
         Column primaryCol = getPrimary(tableName);
 
         int tableRowCount = getTableRowCount(tableName);
