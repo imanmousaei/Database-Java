@@ -37,24 +37,39 @@ public class Engine {
         writer.writeBoolean(true); // deleted = true
     }
 
-    public static void insertToTable(String tableName, JsonObject obj) throws IOException {
+    public static void insertRow(String tableName, JsonObject obj) throws IOException {
         // todo check if the primary already exists (validation Responsibility)
-        String directory = "Tables/" + tableName + "/";
         Column primaryCol = getPrimary(tableName);
         int firstDeletedRow = firstDeletedRowIndex(tableName);
-        int sizeUsed = 0;
+        insertToNthRow(obj,tableName,firstDeletedRow,primaryCol);
+    }
 
+    public static void editRow(String tableName, JsonObject obj) throws IOException {
+        Column primaryCol = getPrimary(tableName);
+        int rowIndex = 0;
+        if(primaryCol.getType().equals(STRING)){
+            rowIndex = getIndex(tableName,obj.getString(primaryCol.getName()));
+        }
+        else if(primaryCol.getType().equals(DOUBLE)){
+            rowIndex = getIndex(tableName,obj.getDouble(primaryCol.getName()));
+        }
+        insertToNthRow(obj,tableName,rowIndex,primaryCol);
+    }
+
+    private static void insertToNthRow(JsonObject obj,String tableName,int rowIndex, Column primaryCol) throws IOException {
+        String directory = "Tables/" + tableName + "/";
         int indexRowSize = primaryCol.getSize() + 1; // bool deleted : 1 Byte
-        appendToFileNthByte(directory + INDEX_FILE_NAME, false, firstDeletedRow * indexRowSize + sizeUsed); // deleted = false
+        int sizeUsed = 0;
+        appendToFileNthByte(directory + INDEX_FILE_NAME, false, rowIndex * indexRowSize + sizeUsed); // deleted = false
 
         sizeUsed += 1;
-        insertValue(directory + INDEX_FILE_NAME, obj, firstDeletedRow * indexRowSize + sizeUsed, primaryCol);
+        insertValue(directory + INDEX_FILE_NAME, obj, rowIndex * indexRowSize + sizeUsed, primaryCol);
 
         int rowSize = getRowSizeInByte(tableName);
         sizeUsed = 0;
 
         for (Column col : allColumns.get(tableName)) {
-            insertValue(directory + DB_FILE_NAME, obj, firstDeletedRow * rowSize + sizeUsed, col);
+            insertValue(directory + DB_FILE_NAME, obj, rowIndex * rowSize + sizeUsed, col);
             sizeUsed += col.getSize();;
         }
     }

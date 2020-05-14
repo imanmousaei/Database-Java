@@ -94,12 +94,6 @@ public class FileIO {
         return -1;
     }
 
-//    public static void editNthRowIndex(String tableName , int n) throws IOException {
-//        String directory = "Tables/" + tableName + "/" ;
-//        RandomAccessFile writer = new RandomAccessFile(new File(directory+INDEX_FILE_NAME), "rw");
-//        writer.seek(writer.length());
-//    }
-
     public static void writeSchemaToFile(String fileName, String primary, ArrayList<Column> cols) throws FileNotFoundException {
         PrintWriter out = new PrintWriter(fileName);
         out.println(primary);

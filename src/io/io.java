@@ -60,7 +60,7 @@ public class io {
             catch (EOFException eof){
 
             }
-            insertToTable(tableName, obj.getObject(DATA));
+            insertRow(tableName, obj.getObject(DATA));
             System.out.println("{\"Status\": \"OK\", \"Message\": \"Row Inserted Successfully.\"}");
         }
         else if (command.equals(DELETE)) {
@@ -68,7 +68,7 @@ public class io {
             System.out.println("{\"Status\": \"OK\", \"Message\": \"Row Deleted Successfully.\"}");
         }
         else if (command.equals(EDIT)) {
-            // todo edit row
+            editRow(tableName, obj.getObject(DATA));
             System.out.println("{\"Status\": \"OK\", \"Message\": \"Row Updated Successfully.\"}");
         }
         else if (command.equals(SEARCH)) {
