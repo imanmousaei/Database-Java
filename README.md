@@ -104,7 +104,11 @@
 {
     "Command" : "Search" ,
     "Table" : $tableName ,
-    $primaryColumnName : $primaryData 
+    "Data" : {
+        $column1Name : $correspondingDataToColumn1 , 
+        $column2Name : $correspondingDataToColumn2 , 
+        ...
+    } 
 }
 ```
 
@@ -113,7 +117,12 @@
 {
     "Command" : "Search" ,
     "Table" : "testTable" ,
-    "id" : 137
+    "Data" : {
+        "name" : "Iman" , 
+        "id" : 137 , 
+        "GPA" : 19.29 ,
+        "password" : "updatedPassword" 
+    } 
 }
 ```
 
