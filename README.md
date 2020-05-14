@@ -119,9 +119,7 @@
     "Table" : "testTable" ,
     "Data" : {
         "name" : "Iman" , 
-        "id" : 137 , 
-        "GPA" : 19.29 ,
-        "password" : "updatedPassword" 
+        "id" : 137
     } 
 }
 ```

@@ -1,13 +1,11 @@
 package Engine;
 
-import model.Column;
-import model.Filterable;
+import model.*;
 import model.JSON.JsonObject;
-import model.MinimalRow;
-import model.Row;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -41,22 +39,61 @@ public class Engine {
         // todo check if the primary already exists (validation Responsibility)
         Column primaryCol = getPrimary(tableName);
         int firstDeletedRow = firstDeletedRowIndex(tableName);
-        insertToNthRow(obj,tableName,firstDeletedRow,primaryCol);
+        insertToNthRow(obj, tableName, firstDeletedRow, primaryCol);
     }
 
     public static void editRow(String tableName, JsonObject obj) throws IOException {
         Column primaryCol = getPrimary(tableName);
         int rowIndex = 0;
-        if(primaryCol.getType().equals(STRING)){
-            rowIndex = getIndex(tableName,obj.getString(primaryCol.getName()));
+        if (primaryCol.getType().equals(STRING)) {
+            rowIndex = getIndex(tableName, obj.getString(primaryCol.getName()));
         }
-        else if(primaryCol.getType().equals(DOUBLE)){
-            rowIndex = getIndex(tableName,obj.getDouble(primaryCol.getName()));
+        else if (primaryCol.getType().equals(DOUBLE)) {
+            rowIndex = getIndex(tableName, obj.getDouble(primaryCol.getName()));
         }
-        insertToNthRow(obj,tableName,rowIndex,primaryCol);
+        insertToNthRow(obj, tableName, rowIndex, primaryCol);
     }
 
-    private static void insertToNthRow(JsonObject obj,String tableName,int rowIndex, Column primaryCol) throws IOException {
+    public static Filterable extractFilterable(JsonObject obj) {
+        return new Filterable() {
+            @Override
+            public boolean isAcceptable(Row r) {
+                if(r.isDeleted()){
+                    return false;
+                }
+                ArrayList<Cell<?>> cells = r.getCells();
+                for (Cell<?> cell : cells) {
+                    if (cell.getValue() instanceof String) {
+                        String cellValue = ((String) cell.getValue()).trim();
+                        try {
+                            String searchedValue = obj.getString(cell.getColumnName());
+                            if (!cellValue.equals(searchedValue)) {
+                                return false;
+                            }
+                        }
+                        catch (NullPointerException npe) {
+
+                        }
+                    }
+                    else if (cell.getValue() instanceof Double) {
+                        double cellValue = (Double) cell.getValue();
+                        try {
+                            double searchedValue = obj.getDouble(cell.getColumnName());
+                            if (cellValue != searchedValue) {
+                                return false;
+                            }
+                        }
+                        catch (NullPointerException npe) {
+
+                        }
+                    }
+                }
+                return true;
+            }
+        };
+    }
+
+    private static void insertToNthRow(JsonObject obj, String tableName, int rowIndex, Column primaryCol) throws IOException {
         String directory = "Tables/" + tableName + "/";
         int indexRowSize = primaryCol.getSize() + 1; // bool deleted : 1 Byte
         int sizeUsed = 0;
@@ -70,7 +107,8 @@ public class Engine {
 
         for (Column col : allColumns.get(tableName)) {
             insertValue(directory + DB_FILE_NAME, obj, rowIndex * rowSize + sizeUsed, col);
-            sizeUsed += col.getSize();;
+            sizeUsed += col.getSize();
+            ;
         }
     }
 
@@ -147,11 +185,12 @@ public class Engine {
         createFile(directory + INDEX_FILE_NAME);
     }
 
-    public static ArrayList<Row> filter(String tableName, Filterable obj) {
+    public static ArrayList<Row> filter(String tableName, Filterable obj, PrintStream out) {
         ArrayList<Row> wantedRows = new ArrayList<>();
         for (Row r : allRows.get(tableName)) {
             if (obj.isAcceptable(r)) {
                 wantedRows.add(r);
+                out.println(r.toString());
             }
         }
         return wantedRows;

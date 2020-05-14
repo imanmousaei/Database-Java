@@ -14,6 +14,10 @@ public class Row {
         cells.add(cell);
     }
 
+    public ArrayList<Cell<?>> getCells() {
+        return cells;
+    }
+
     public boolean isDeleted() {
         return deleted;
     }

@@ -13,6 +13,10 @@ public class Cell<T> {
         this.columnName = columnName;
     }
 
+    public String getColumnName() {
+        return columnName;
+    }
+
     public T getValue() {
         return value;
     }

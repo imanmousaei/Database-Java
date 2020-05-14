@@ -57,7 +57,7 @@ public class io {
                 cacheAllRows(tableName);
                 cacheAllMinimalRows(tableName);
             }
-            catch (EOFException eof){
+            catch (EOFException eof) {
 
             }
             insertRow(tableName, obj.getObject(DATA));
@@ -72,8 +72,8 @@ public class io {
             System.out.println("{\"Status\": \"OK\", \"Message\": \"Row Updated Successfully.\"}");
         }
         else if (command.equals(SEARCH)) {
-            // todo
-//            filter()
+            cacheAllRows(tableName);
+            filter(tableName, extractFilterable(obj.getObject(DATA)), System.out);
         }
         else if (command.equals(SHOW_TABLE)) {
             cacheAllRows(tableName);
