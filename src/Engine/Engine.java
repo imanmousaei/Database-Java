@@ -12,10 +12,12 @@ import java.util.Scanner;
 
 import static io.FileIO.*;
 import static io.Strings.*;
+import static io.Validation.validatePrimary;
+import static io.Validation.validateRowExistance;
 import static io.io.*;
 
 public class Engine {
-    public static void deleteRow(String tableName, JsonObject obj) throws IOException {
+    public static void deleteRow(String tableName, JsonObject obj) throws NoSuchRowException,IOException {
         String directory = "Tables/" + tableName + "/";
         RandomAccessFile writer = new RandomAccessFile(new File(directory + INDEX_FILE_NAME), "rw");
         Column primaryCol = getPrimary(tableName);
@@ -25,31 +27,38 @@ public class Engine {
             String wantedPrimary = obj.getString(primaryCol.getName());
             int index = getIndex(tableName, wantedPrimary);
             writer.seek(index * indexRowSize);
+            validateRowExistance(index);
         }
         else {
             double wantedPrimary = obj.getDouble(primaryCol.getName());
             int index = getIndex(tableName, wantedPrimary);
             writer.seek(index * indexRowSize);
+            validateRowExistance(index);
         }
+
 
         writer.writeBoolean(true); // deleted = true
     }
 
-    public static void insertRow(String tableName, JsonObject obj) throws IOException {
-        // todo check if the primary already exists (validation Responsibility)
+    public static void insertRow(String tableName, JsonObject obj) throws PrimaryAlreadyExistsException, IOException {
         Column primaryCol = getPrimary(tableName);
+
+        validatePrimary(tableName, primaryCol, obj);
+
         int firstDeletedRow = firstDeletedRowIndex(tableName);
         insertToNthRow(obj, tableName, firstDeletedRow, primaryCol);
     }
 
-    public static void editRow(String tableName, JsonObject obj) throws IOException {
+    public static void editRow(String tableName, JsonObject obj) throws NoSuchRowException,IOException {
         Column primaryCol = getPrimary(tableName);
         int rowIndex = 0;
         if (primaryCol.getType().equals(STRING)) {
             rowIndex = getIndex(tableName, obj.getString(primaryCol.getName()));
+            validateRowExistance(rowIndex);
         }
         else if (primaryCol.getType().equals(DOUBLE)) {
             rowIndex = getIndex(tableName, obj.getDouble(primaryCol.getName()));
+            validateRowExistance(rowIndex);
         }
         insertToNthRow(obj, tableName, rowIndex, primaryCol);
     }
@@ -58,7 +67,7 @@ public class Engine {
         return new Filterable() {
             @Override
             public boolean isAcceptable(Row r) {
-                if(r.isDeleted()){
+                if (r.isDeleted()) {
                     return false;
                 }
                 ArrayList<Cell<?>> cells = r.getCells();
@@ -115,6 +124,7 @@ public class Engine {
     private static void insertValue(String fileName, JsonObject obj, long byteToAppend, Column col) throws IOException {
         if (col.getType().equals(DOUBLE)) { // What todo if there is int type?
             double value = obj.getDouble(col.getName());
+
             appendToFileNthByte(fileName, value, byteToAppend);
         }
         else {

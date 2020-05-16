@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 
+import Engine.InvalidJsonException;
 import model.*;
 import model.JSON.*;
 
@@ -13,6 +14,7 @@ import model.JSON.*;
 import static Engine.Engine.*;
 import static io.FileIO.*;
 import static io.Strings.*;
+import static io.Validation.validateJson;
 
 // why everything is static ??
 public class io {
@@ -20,7 +22,7 @@ public class io {
     public static HashMap<String, ArrayList<Column>> allColumns = new HashMap<>();
     public static HashMap<String, ArrayList<MinimalRow<?>>> allMinimalRows = new HashMap<>();
 
-    public static String readJSONObject(InputStream in) {
+    public static String readJSONObject(InputStream in) throws InvalidJsonException {
         Scanner scanner = new Scanner(in);
         String nextLine = scanner.nextLine();
         String json = nextLine;
@@ -29,11 +31,13 @@ public class io {
             json = json.concat(nextLine);
         }
         json = json.concat("}");
+
+        validateJson(json);
+
         return json;
     }
 
     public static void processInput(String input) throws IOException {
-        // todo Entity validation
         JsonObject obj = new JsonObject(input);
         obj.trimInput();
         obj.processInput();
@@ -44,6 +48,7 @@ public class io {
         }
 
         String tableName = obj.getString(TABLE);
+
 
         if (command.equals(CREATE_TABLE)) {
             String primary = obj.getString(PRIMARY);
